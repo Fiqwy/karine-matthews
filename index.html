@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#100B22">
+
+  <!-- Evict any stale service worker left by a previous site on this domain -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
+      if (self.caches && caches.keys) { caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }).catch(function () {}); }
+    }
+  </script>
+
+  <title>Karine S. Matthews — Psychic Medium, Reiki Healer &amp; Mindset Coach · Gold Coast</title>
+  <meta name="description" content="Intuitive psychic and mediumship readings, Reiki energy healing and mindset coaching with Karine S. Matthews. In person in Gilston, Gold Coast Hinterland, or online worldwide.">
+  <link rel="canonical" href="https://karinematthews.com.au/">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="Karine S. Matthews — Psychic Medium, Reiki Healer &amp; Mindset Coach">
+  <meta property="og:description" content="Reconnect with your truth. Intuitive readings, Reiki healing and mindset coaching. In person in Gilston, or online worldwide.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://karinematthews.com.au/">
+  <meta property="og:image" content="https://karinematthews.com.au/assets/og/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Fonts: Fraunces (serif display + emotional italics) + Manrope (sans body/UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Favicon — crescent moon in candlelight gold on a night-sky field -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A0714'/%3E%3Cpath d='M20.5 21a7 7 0 1 1-4.2-12.9 8 8 0 1 0 4.2 12.9z' fill='%23E8C583'/%3E%3Ccircle cx='22' cy='10' r='1.3' fill='%23D9BBF2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Skip to main content — visible only on keyboard focus -->
+  <a href="#services" class="skip-link">Skip to services</a>
+
+  <!-- ============================================================
+       CINEMATIC PAGE-LOAD OVERTURE — JS removes when done
+       ============================================================ -->
+  <div class="overture" id="overture" aria-hidden="true">
+    <div class="overture-bloom" id="overtureBloom"></div>
+    <div class="overture-mark" id="overtureMark">KARINE</div>
+  </div>
+
+  <!-- CURSOR GLOW (desktop only) -->
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+  <!-- ============================================================
+       NAV
+       ============================================================ -->
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a href="#top" class="brand-mark" id="brandMark">KARINE</a>
+      <nav aria-label="Primary">
+        <ul class="nav-links">
+          <li><a href="#services">Sessions</a></li>
+          <li><a href="#journey">How it works</a></li>
+          <li><a href="#shop" data-nav="shop">Shop</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#sacred">Sacred content</a></li>
+        </ul>
+      </nav>
+      <div class="nav-cta">
+        <a href="#" id="navBook" class="btn btn-primary">Book a session <span class="arrow">→</span></a>
+        <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile drawer -->
+  <div class="drawer" id="drawer" aria-hidden="true" inert>
+    <a href="#services">Sessions</a>
+    <a href="#reiki-supports">Reiki healing</a>
+    <a href="#journey">How it works</a>
+    <a href="#shop" data-nav="shop">The pendulum shop</a>
+    <a href="#about">About Karine</a>
+    <a href="#sacred">Sacred content</a>
+    <a href="#book">Book a reading</a>
+    <a href="#book" id="drawerBook" class="btn btn-primary">Book a session</a>
+  </div>
+
+  <main id="top">
+    <!-- ============================================================
+         HERO — celestial scene (real portrait slots in when supplied)
+         ============================================================ -->
+    <section class="hero" id="hero">
+      <div class="hero-bg" id="heroBg" aria-hidden="true">
+        <div class="hero-media" id="heroMedia"></div>
+        <div class="hero-aura"></div>
+        <div class="hero-stars-static"></div>
+      </div>
+      <canvas class="hero-stars" id="heroStars" aria-hidden="true"></canvas>
+
+      <div class="container hero-content" id="heroContent">
+        <p class="eyebrow" id="heroEyebrow"><span class="dot"></span><span></span></p>
+        <h1 class="hero-title split" id="heroTitle"></h1>
+        <p class="hero-sub" id="heroSub"></p>
+        <div class="hero-ctas" id="heroCtas"></div>
+        <ul class="hero-trust" id="heroTrust" aria-label="What to expect"></ul>
+      </div>
+
+      <div class="scroll-cue" aria-hidden="true"></div>
+    </section>
+
+    <!-- ============================================================
+         WELCOME / INTRO — moonlight band
+         ============================================================ -->
+    <section class="welcome band--moon" id="welcome">
+      <div class="container-narrow welcome-inner">
+        <p class="eyebrow" id="welcomeEyebrow"><span class="dot"></span></p>
+        <ul class="welcome-questions" id="welcomeQuestions" aria-label="You may be wondering"></ul>
+        <p class="welcome-emotional foil-line" id="welcomeEmotional"></p>
+        <p class="welcome-body" id="welcomeBody"></p>
+      </div>
+    </section>
+    <div class="divider" data-reveal></div>
+
+    <!-- ============================================================
+         EARLY PROOF — one powerful, real reflection, placed high
+         (renders the featured testimonial; hides if none exists)
+         ============================================================ -->
+    <section class="proof-early" id="proof-early" hidden>
+      <div class="container-narrow">
+        <figure class="proof-early-card" data-reveal>
+          <span class="proof-early-mark" aria-hidden="true">&ldquo;</span>
+          <blockquote class="proof-early-quote" id="proofEarlyQuote"></blockquote>
+          <figcaption class="proof-early-meta" id="proofEarlyMeta"></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SERVICES — Readings, Reiki, Coaching
+         ============================================================ -->
+    <section class="services" id="services">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow"><span class="dot"></span> Sessions</p>
+          <h2 class="split">Guidance, healing and clarity, <em>held with care.</em></h2>
+          <p>Each session is intuitively guided by Spirit and shaped around you. In person in Gilston, or online from anywhere in the world.</p>
+        </div>
+        <div class="services-grid" id="servicesGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         WHAT REIKI MAY SUPPORT
+         ============================================================ -->
+    <section class="supports" id="reiki-supports">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow" id="supportsEyebrow"><span class="dot"></span></p>
+          <h2 class="split" id="supportsTitle"></h2>
+          <p id="supportsNote"></p>
+        </div>
+        <ul class="supports-grid" id="supportsGrid"></ul>
+      </div>
+    </section>
+    <div class="divider" data-reveal></div>
+
+    <!-- ============================================================
+         THE SESSION JOURNEY — moonlight band
+         ============================================================ -->
+    <section class="journey band--moon" id="journey">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow" id="journeyEyebrow"><span class="dot"></span></p>
+          <h2 class="split" id="journeyTitle"></h2>
+        </div>
+      </div>
+      <div class="journey-track-wrap" id="journeyTrackWrap">
+        <div class="journey-track" id="journeyTrack"></div>
+      </div>
+      <div class="container">
+        <div class="journey-modes" id="journeyModes"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         VOICES / TESTIMONIALS — proof, high on the page (right after
+         "how it works"). Featured quote already shown up top is excluded.
+         ============================================================ -->
+    <section class="voices" id="voices">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow"><span class="dot"></span> Voices</p>
+          <h2 class="split" id="voicesTitle"></h2>
+          <p id="voicesSub"></p>
+        </div>
+        <div class="voices-grid" id="voicesGrid"></div>
+      </div>
+    </section>
+    <div class="divider" data-reveal></div>
+
+    <!-- ============================================================
+         ABOUT KARINE — the gifted woman behind the sessions (authority)
+         ============================================================ -->
+    <section class="about" id="about">
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-portrait">
+            <img id="aboutPhoto" src="" alt="" loading="lazy">
+          </div>
+          <div class="about-text" data-reveal>
+            <p class="eyebrow"><span class="dot"></span> About</p>
+            <h2 class="split" id="aboutH">The heart behind every <em>session.</em></h2>
+            <p id="aboutBio"></p>
+            <p class="about-signature" id="aboutSig"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         ATMOSPHERE / GALLERY — her real sacred space (credibility;
+         hidden until real photos exist)
+         ============================================================ -->
+    <section class="atmosphere" id="atmosphere" hidden>
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow" id="atmosphereEyebrow"><span class="dot"></span></p>
+          <h2 class="split" id="atmosphereTitle"></h2>
+          <p id="atmosphereNote"></p>
+        </div>
+        <div class="atmosphere-grid" id="atmosphereGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PENDULUM SHOP — secondary offer (hidden until real products exist)
+         ============================================================ -->
+    <section class="shop" id="shop" hidden>
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow" id="shopEyebrow"><span class="dot"></span></p>
+          <h2 class="split" id="shopTitle"></h2>
+          <p id="shopNote"></p>
+        </div>
+        <div class="shop-grid" id="shopGrid"></div>
+      </div>
+    </section>
+    <div class="divider" data-reveal></div>
+
+    <!-- ============================================================
+         COMING SOON — recorded meditations + workshops (capture the not-yet-ready)
+         ============================================================ -->
+    <section class="coming-soon" id="comingSoon">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow" id="csEyebrow"><span class="dot"></span></p>
+          <p class="cs-emotional foil-line" id="csEmotional"></p>
+        </div>
+        <div class="cs-grid" id="csGrid"></div>
+        <div class="cs-cta" id="csCta"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SACRED CONTENT + SOCIALS — the softest way to stay close
+         ============================================================ -->
+    <section class="sacred" id="sacred">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow" id="sacredEyebrow"><span class="dot"></span></p>
+          <p class="sacred-emotional foil-line" id="sacredEmotional"></p>
+          <p id="sacredBody"></p>
+        </div>
+        <div class="sacred-grid" id="sacredGrid"></div>
+        <div class="sacred-socials" id="sacredSocials" aria-label="Follow Karine"></div>
+      </div>
+    </section>
+    <div class="divider" data-reveal></div>
+
+    <!-- ============================================================
+         FAQ
+         ============================================================ -->
+    <section class="faq" id="faq">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow"><span class="dot"></span> Questions</p>
+          <h2 class="split">The things people ask before booking.</h2>
+        </div>
+        <div class="faq-list" id="faqList"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CTA STRIP
+         ============================================================ -->
+    <section class="cta-strip" id="cta">
+      <div class="container">
+        <p class="eyebrow" id="ctaEyebrow"><span class="dot"></span></p>
+        <h2 class="split foil-in" id="ctaTitle"></h2>
+        <p id="ctaBody"></p>
+        <div class="cta-strip-ctas" id="ctaCtas"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         BOOK A READING — booking builder → pre-filled SMS
+         ============================================================ -->
+    <section class="booking" id="book">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow"><span class="dot"></span> Book a reading</p>
+          <h2 class="split">Let's find a time that feels <em>right.</em></h2>
+          <p>Choose what you feel drawn to below and it opens a text to me, gently pre-filled and ready to send. I read every message myself and reply with the times I have open. Prefer to simply call or message instead? My details are right here.</p>
+        </div>
+        <div class="booking-grid">
+          <form class="booking-form" id="bookingForm" novalidate>
+            <fieldset class="bk-field">
+              <legend>1 · Which session?</legend>
+              <div class="bk-sessions" id="bkSessions"></div>
+            </fieldset>
+            <fieldset class="bk-field" id="bkFormatField">
+              <legend>2 · In person or online?</legend>
+              <div class="bk-radios" id="bkFormat">
+                <label class="bk-radio"><input type="radio" name="format" value="In person, Gilston" checked><span>In person, Gilston</span></label>
+                <label class="bk-radio"><input type="radio" name="format" value="Online (FaceTime, WhatsApp or Zoom)"><span>Online</span></label>
+              </div>
+              <p class="bk-hint" id="bkFormatHint"></p>
+            </fieldset>
+            <div class="bk-field">
+              <label for="bkWhen">3 · Preferred days &amp; times</label>
+              <input id="bkWhen" name="when" type="text" placeholder="e.g. weekday evenings, or a Saturday morning">
+            </div>
+            <div class="bk-field">
+              <label for="bkFocus">4 · Anything you'd like me to focus on?</label>
+              <textarea id="bkFocus" name="focus" placeholder="A particular question, or a loved one in Spirit you'd like me to connect with..."></textarea>
+            </div>
+            <div class="bk-field">
+              <label for="bkQuestions">Any questions for me? (optional)</label>
+              <textarea id="bkQuestions" name="questions"></textarea>
+            </div>
+            <div class="field-row">
+              <div class="bk-field">
+                <label for="bkName">Your name</label>
+                <input id="bkName" name="name" type="text" autocomplete="name" required>
+              </div>
+              <div class="bk-field">
+                <label for="bkPhone">Your mobile</label>
+                <input id="bkPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel">
+              </div>
+            </div>
+            <div class="form-submit">
+              <button type="submit" class="btn btn-primary">Send my booking request <span class="arrow">→</span></button>
+            </div>
+            <p class="form-note" id="formNote"></p>
+          </form>
+
+          <aside class="booking-side" data-reveal>
+            <h3>Prefer to reach out directly?</h3>
+            <div class="contact-channels" id="contactChannels"></div>
+            <p class="booking-reassure">Every reading is a gentle, private space. There are no silly questions, and nothing you share leaves the room.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-tag">KARINE S. MATTHEWS</div>
+          <p class="footer-blurb" id="footerBlurb"></p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="#services">Sessions</a></li>
+            <li><a href="#journey">How it works</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Connect</h4>
+          <ul id="footerDirect"></ul>
+        </div>
+        <div>
+          <h4>Follow</h4>
+          <ul id="footerSocials"></ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span id="footerCopy">© Karine S. Matthews</span>
+        <span id="footerRegion">Gilston, Gold Coast Hinterland, QLD</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating mobile message button -->
+  <a href="#" class="float-call" id="floatMsg" aria-label="Text Karine">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z"/></svg>
+  </a>
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json" id="ldSchema"></script>
+
+  <!-- Vendor -->
+  <script src="vendor/lenis.min.js"></script>
+  <script src="vendor/gsap.min.js"></script>
+  <script src="vendor/ScrollTrigger.min.js"></script>
+
+  <!-- App -->
+  <script type="module" src="script.js"></script>
+</body>
+</html>
