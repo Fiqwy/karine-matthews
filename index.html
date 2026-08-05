@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#100B22">
+  <meta name="theme-color" content="#FDF8EF">
 
   <!-- Evict any stale service worker left by a previous site on this domain -->
   <script>
@@ -13,25 +13,25 @@
     }
   </script>
 
-  <title>Karine S. Matthews — Psychic Medium, Reiki Healer &amp; Mindset Coach · Gold Coast</title>
-  <meta name="description" content="Intuitive psychic and mediumship readings, Reiki energy healing and mindset coaching with Karine S. Matthews. In person in Gilston, Gold Coast Hinterland, or online worldwide.">
+  <title>Karine S. Matthews — Psychic Medium &amp; Reiki Healer · Gold Coast</title>
+  <meta name="description" content="Intuitive psychic mediumship readings and Reiki energy healing with Karine S. Matthews. Readings in person in Gilston, Gold Coast Hinterland, or online worldwide.">
   <link rel="canonical" href="https://karinematthews.com.au/">
 
   <!-- Open Graph / Twitter -->
-  <meta property="og:title" content="Karine S. Matthews — Psychic Medium, Reiki Healer &amp; Mindset Coach">
-  <meta property="og:description" content="Reconnect with your truth. Intuitive readings, Reiki healing and mindset coaching. In person in Gilston, or online worldwide.">
+  <meta property="og:title" content="Karine S. Matthews — Psychic Medium &amp; Reiki Healer">
+  <meta property="og:description" content="Reconnect with your truth. Intuitive psychic mediumship readings and Reiki healing. In person in Gilston, or online worldwide.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://karinematthews.com.au/">
   <meta property="og:image" content="https://karinematthews.com.au/assets/og/og-image.jpg">
   <meta name="twitter:card" content="summary_large_image">
 
-  <!-- Fonts: Fraunces (serif display + emotional italics) + Manrope (sans body/UI) -->
+  <!-- Fonts: Cormorant Garamond (serif display + emotional italics) + Jost (sans body/UI) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Favicon — crescent moon in candlelight gold on a night-sky field -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A0714'/%3E%3Cpath d='M20.5 21a7 7 0 1 1-4.2-12.9 8 8 0 1 0 4.2 12.9z' fill='%23E8C583'/%3E%3Ccircle cx='22' cy='10' r='1.3' fill='%23D9BBF2'/%3E%3C/svg%3E">
+  <!-- Favicon — crescent moon in candlelight gold on a deep warm field -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232B1D10'/%3E%3Cpath d='M20.5 21a7 7 0 1 1-4.2-12.9 8 8 0 1 0 4.2 12.9z' fill='%23E8C583'/%3E%3Ccircle cx='22' cy='10' r='1.3' fill='%23C0764E'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -88,19 +88,20 @@
 
   <main id="top">
     <!-- ============================================================
-         HERO — celestial scene (real portrait slots in when supplied)
+         HERO — golden-hour scene
          ============================================================ -->
     <section class="hero" id="hero">
       <div class="hero-bg" id="heroBg" aria-hidden="true">
         <div class="hero-media" id="heroMedia"></div>
         <div class="hero-aura"></div>
-        <div class="hero-stars-static"></div>
+        <div class="hero-glints"></div>
       </div>
-      <canvas class="hero-stars" id="heroStars" aria-hidden="true"></canvas>
+      <canvas class="hero-motes" id="heroMotes" aria-hidden="true"></canvas>
 
       <div class="container hero-content" id="heroContent">
-        <p class="eyebrow" id="heroEyebrow"><span class="dot"></span><span></span></p>
+        <p class="hero-kicker" id="heroKicker"></p>
         <h1 class="hero-title split" id="heroTitle"></h1>
+        <p class="hero-tagline" id="heroTagline"></p>
         <p class="hero-sub" id="heroSub"></p>
         <div class="hero-ctas" id="heroCtas"></div>
         <ul class="hero-trust" id="heroTrust" aria-label="What to expect"></ul>
@@ -110,9 +111,9 @@
     </section>
 
     <!-- ============================================================
-         WELCOME / INTRO — moonlight band
+         WELCOME / INTRO — dusk band
          ============================================================ -->
-    <section class="welcome band--moon" id="welcome">
+    <section class="welcome band--dusk" id="welcome">
       <div class="container-narrow welcome-inner">
         <p class="eyebrow" id="welcomeEyebrow"><span class="dot"></span></p>
         <ul class="welcome-questions" id="welcomeQuestions" aria-label="You may be wondering"></ul>
@@ -147,6 +148,14 @@
           <p>Each session is intuitively guided by Spirit and shaped around you. In person in Gilston, or online from anywhere in the world.</p>
         </div>
         <div class="services-grid" id="servicesGrid"></div>
+
+        <!-- Mindset coaching: a bonus INCLUDED in a session, not a service she sells -->
+        <aside class="inclusion" id="mindsetCoaching" data-reveal hidden>
+          <p class="eyebrow"><span class="dot"></span> <span id="mcEyebrow"></span></p>
+          <h3 class="inclusion-title" id="mcTitle"></h3>
+          <p class="inclusion-emotional" id="mcEmotional"></p>
+          <div id="mcBody"></div>
+        </aside>
       </div>
     </section>
 
@@ -166,9 +175,9 @@
     <div class="divider" data-reveal></div>
 
     <!-- ============================================================
-         THE SESSION JOURNEY — moonlight band
+         THE SESSION JOURNEY — dusk band
          ============================================================ -->
-    <section class="journey band--moon" id="journey">
+    <section class="journey band--dusk" id="journey">
       <div class="container">
         <div class="section-head">
           <p class="eyebrow" id="journeyEyebrow"><span class="dot"></span></p>
@@ -192,7 +201,8 @@
         <div class="section-head">
           <p class="eyebrow"><span class="dot"></span> Voices</p>
           <h2 class="split" id="voicesTitle"></h2>
-          <p id="voicesSub"></p>
+          <p class="voices-subhead" id="voicesSubhead"></p>
+          <div id="voicesSub"></div>
         </div>
         <div class="voices-grid" id="voicesGrid"></div>
       </div>
@@ -209,9 +219,9 @@
             <img id="aboutPhoto" src="" alt="" loading="lazy">
           </div>
           <div class="about-text" data-reveal>
-            <p class="eyebrow"><span class="dot"></span> About</p>
+            <p class="eyebrow"><span class="dot"></span> <span id="aboutEyebrow">About</span></p>
             <h2 class="split" id="aboutH">The heart behind every <em>session.</em></h2>
-            <p id="aboutBio"></p>
+            <div id="aboutBio"></div>
             <p class="about-signature" id="aboutSig"></p>
           </div>
         </div>
@@ -255,7 +265,7 @@
       <div class="container">
         <div class="section-head">
           <p class="eyebrow" id="csEyebrow"><span class="dot"></span></p>
-          <p class="cs-emotional foil-line" id="csEmotional"></p>
+          <h2 class="cs-emotional foil-line" id="csEmotional"></h2>
         </div>
         <div class="cs-grid" id="csGrid"></div>
         <div class="cs-cta" id="csCta"></div>
@@ -269,7 +279,7 @@
       <div class="container">
         <div class="section-head">
           <p class="eyebrow" id="sacredEyebrow"><span class="dot"></span></p>
-          <p class="sacred-emotional foil-line" id="sacredEmotional"></p>
+          <h2 class="sacred-emotional foil-line" id="sacredEmotional"></h2>
           <p id="sacredBody"></p>
         </div>
         <div class="sacred-grid" id="sacredGrid"></div>
@@ -297,7 +307,7 @@
     <section class="cta-strip" id="cta">
       <div class="container">
         <p class="eyebrow" id="ctaEyebrow"><span class="dot"></span></p>
-        <h2 class="split foil-in" id="ctaTitle"></h2>
+        <h2 class="split" id="ctaTitle"></h2>
         <p id="ctaBody"></p>
         <div class="cta-strip-ctas" id="ctaCtas"></div>
       </div>
@@ -323,36 +333,47 @@
               <legend>2 · In person or online?</legend>
               <div class="bk-radios" id="bkFormat">
                 <label class="bk-radio"><input type="radio" name="format" value="In person, Gilston" checked><span>In person, Gilston</span></label>
-                <label class="bk-radio"><input type="radio" name="format" value="Online (FaceTime, WhatsApp or Zoom)"><span>Online</span></label>
+                <label class="bk-radio"><input type="radio" name="format" value="Online"><span>Online</span></label>
               </div>
               <p class="bk-hint" id="bkFormatHint"></p>
+              <!-- Revealed only when Online is chosen -->
+              <div class="bk-platform" id="bkPlatform" hidden>
+                <span class="bk-platform-label">Which platform suits you?</span>
+                <div class="bk-radios" id="bkPlatformOpts"></div>
+              </div>
+            </fieldset>
+            <fieldset class="bk-field">
+              <legend>3 · Preferred days &amp; times</legend>
+              <p class="bk-hint">Tick every slot that could work. The more you tick, the sooner I can find you a time.</p>
+              <div class="bk-when" id="bkWhen"></div>
             </fieldset>
             <div class="bk-field">
-              <label for="bkWhen">3 · Preferred days &amp; times</label>
-              <input id="bkWhen" name="when" type="text" placeholder="e.g. weekday evenings, or a Saturday morning">
-            </div>
-            <div class="bk-field">
               <label for="bkFocus">4 · Anything you'd like me to focus on?</label>
-              <textarea id="bkFocus" name="focus" placeholder="A particular question, or a loved one in Spirit you'd like me to connect with..."></textarea>
+              <textarea id="bkFocus" name="focus"></textarea>
             </div>
             <div class="bk-field">
               <label for="bkQuestions">Any questions for me? (optional)</label>
               <textarea id="bkQuestions" name="questions"></textarea>
             </div>
-            <div class="field-row">
-              <div class="bk-field">
-                <label for="bkName">Your name</label>
-                <input id="bkName" name="name" type="text" autocomplete="name" required>
+            <fieldset class="bk-field">
+              <legend>5 · Your details</legend>
+              <div class="field-row">
+                <div class="bk-field">
+                  <label for="bkName">Your full name</label>
+                  <input id="bkName" name="name" type="text" autocomplete="name" required>
+                </div>
+                <div class="bk-field">
+                  <label for="bkPhone">Your phone number</label>
+                  <input id="bkPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required>
+                </div>
               </div>
-              <div class="bk-field">
-                <label for="bkPhone">Your mobile</label>
-                <input id="bkPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel">
-              </div>
-            </div>
+              <p class="bk-selfie" id="bkSelfie"></p>
+            </fieldset>
             <div class="form-submit">
               <button type="submit" class="btn btn-primary">Send my booking request <span class="arrow">→</span></button>
             </div>
             <p class="form-note" id="formNote"></p>
+            <div class="bk-payment" id="bkPayment"></div>
           </form>
 
           <aside class="booking-side" data-reveal>
@@ -376,7 +397,7 @@
           <p class="footer-blurb" id="footerBlurb"></p>
         </div>
         <div>
-          <h4>Explore</h4>
+          <h3>Explore</h3>
           <ul>
             <li><a href="#services">Sessions</a></li>
             <li><a href="#journey">How it works</a></li>
@@ -385,11 +406,11 @@
           </ul>
         </div>
         <div>
-          <h4>Connect</h4>
+          <h3>Connect</h3>
           <ul id="footerDirect"></ul>
         </div>
         <div>
-          <h4>Follow</h4>
+          <h3>Follow</h3>
           <ul id="footerSocials"></ul>
         </div>
       </div>

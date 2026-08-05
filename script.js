@@ -1,6 +1,6 @@
 // ============================================================
 // KARINE S. MATTHEWS — APP SCRIPT
-// Renders from content.js, wires Lenis + GSAP, celestial motion layer.
+// Renders from content.js, wires Lenis + GSAP, golden-hour motion layer.
 // Booking is SMS-first: every Book / Text / Order button resolves to
 // a pre-filled sms: message (no server, no fake-success forms).
 // ============================================================
@@ -8,7 +8,7 @@ import { content } from './content.js';
 
 const REDUCED  = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const NO_HOVER = matchMedia('(hover: none)').matches;
-// FX = the desktop-only signature layer (tilt, cursor trail, moon dial, parallax,
+// FX = the desktop-only signature layer (tilt, cursor trail, sun dial, parallax,
 // continuous shimmer/aurora). Hard-gated so the phone stays pristine.
 const FX = !REDUCED && !NO_HOVER && window.innerWidth >= 1025;
 document.documentElement.classList.add('has-js');
@@ -19,6 +19,8 @@ function $$(sel, root = document) { return Array.from(root.querySelectorAll(sel)
 
 // Currency — plain AUD, no decimals (prices are whole dollars).
 function currencyAU(n) { return '$' + Number(n).toLocaleString('en-AU'); }
+// Karine asked for prices to read "$90 AUD". priceSuffix lives in content.js.
+function priceAUD(n) { const sfx = content.booking && content.booking.priceSuffix; return currencyAU(n) + (sfx ? ' ' + sfx : ''); }
 
 // Build a pre-filled SMS booking/enquiry link from a short intro line.
 function bookingSms(intro) {
@@ -64,6 +66,12 @@ function applySplits() {
   });
 }
 
+// Karine writes her copy in paragraphs. Split on blank lines so her
+// intended breaks survive instead of collapsing into one block.
+function paras(text, cls) {
+  return String(text || '').split(/\n{2,}/).map(t => `<p class="${cls}">${t.trim()}</p>`).join('');
+}
+
 // Small inline SVG glyph set (stroke icons).
 const GLYPHS = {
   home:   `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15 16 6l11 9"/><path d="M8 13v12h16V13"/><path d="M13 25v-6h6v6"/></svg>`,
@@ -80,7 +88,10 @@ const GLYPHS = {
 // ============================================================
 function renderHero() {
   const h = content.hero;
-  $('#heroEyebrow span:last-child').textContent = h.eyebrow;
+  $('#heroKicker').textContent = h.kicker;
+  // Her four pillars, gold-dot separated exactly as they sit on her banner.
+  $('#heroTagline').innerHTML = (h.tagline || [])
+    .map(t => `<span>${t}</span>`).join('<i class="tagline-dot" aria-hidden="true">·</i>');
 
   const title = $('#heroTitle');
   title.innerHTML = h.headlineLines.map(line => `<span class="line">${line}</span>`).join('');
@@ -146,14 +157,15 @@ function renderServices() {
     const priceRow = s.enquireOnly
       ? `<div class="svc-price svc-price-enquire">By enquiry</div>`
       : `<div class="svc-options">${s.options.map(o =>
-          `<span class="svc-opt"><span class="svc-opt-label">${o.label}</span><span class="svc-opt-price">${currencyAU(o.price)}</span></span>`
+          `<span class="svc-opt"><span class="svc-opt-label">${o.label}</span><span class="svc-opt-price">${priceAUD(o.price)}</span></span>`
         ).join('')}</div>`;
     return `
     <article class="svc-card" data-reveal>
       <div class="svc-card-glow" aria-hidden="true"></div>
       <h3 class="svc-name">${s.name}</h3>
       <p class="svc-modality">${s.modality}</p>
-      <p class="svc-blurb">${s.blurb}</p>
+      ${s.tagline ? `<p class="svc-tagline">${s.tagline}</p>` : ''}
+      ${paras(s.blurb, "svc-blurb")}
       ${priceRow}
       <div class="svc-cta">
         <a href="#book" class="btn ${s.enquireOnly ? 'btn-ghost' : 'btn-primary'}" data-book="${s.id}">${s.cta.label} <span class="arrow">→</span></a>
@@ -161,6 +173,19 @@ function renderServices() {
       </div>
     </article>`;
   }).join('');
+}
+
+// Mindset coaching is an INCLUSION, not a service. Hidden if she ever removes it.
+function renderMindsetCoaching() {
+  const c = content.mindsetCoaching;
+  const section = $('#mindsetCoaching');
+  if (!section) return;
+  if (!c) { section.hidden = true; return; }
+  section.hidden = false;
+  $('#mcEyebrow').textContent = c.eyebrow;
+  $('#mcTitle').textContent = c.title;
+  $('#mcEmotional').innerHTML = c.emotional;
+  $('#mcBody').innerHTML = paras(c.blurb, 'inclusion-p');
 }
 
 function renderReikiSupports() {
@@ -205,7 +230,7 @@ function renderJourney() {
 
 // ---- SHOP: checkoutUrl-or-SMS, price from single source, hide if empty ----
 function shopSms(p) {
-  const priceStr = p.price ? ` (${currencyAU(p.price)} AUD)` : '';
+  const priceStr = p.price ? ` (${priceAUD(p.price)})` : '';
   const body = encodeURIComponent(
     `Hi Karine! I'd like to order the ${p.name} pendulum${priceStr}. My name: , Delivery postcode: `
   );
@@ -232,12 +257,12 @@ function renderShop() {
   $('#shopGrid').innerHTML = s.products.map(p => {
     const href = productBuyHref(p);
     const isCart = !!p.checkoutUrl;
-    const emailPrice = p.price ? ' (' + currencyAU(p.price) + ' AUD)' : '';
+    const emailPrice = p.price ? ' (' + priceAUD(p.price) + ')' : '';
     const emailHref = `mailto:${content.booking.email}?subject=${encodeURIComponent('Pendulum order: ' + p.name)}&body=${encodeURIComponent("Hi Karine, I'd like to order the " + p.name + ' pendulum' + emailPrice + '.')}`;
     return `
     <article class="pendulum-card" data-reveal>
       <div class="pendulum-media">
-        <img src="${p.image}" alt="${p.alt}" loading="lazy" onerror="this.parentElement.style.background='var(--bg-elev)';this.remove()">
+        <img src="${p.image}" alt="${p.alt}" loading="lazy" onerror="this.parentElement.style.background='var(--surface-3)';this.remove()">
         ${p.soldOut ? `<span class="pendulum-flag">Sold out</span>` : ''}
       </div>
       <h3 class="pendulum-name">${p.name}</h3>
@@ -270,7 +295,7 @@ function renderGallery() {
     const cat = (g.categories || []).find(c => c.id === it.category);
     return `
       <figure class="atmosphere-tile ${cls}" data-reveal>
-        <img src="${it.src}" alt="${it.alt}" loading="lazy" onerror="this.parentElement.style.background='var(--bg-elev)';this.remove()">
+        <img src="${it.src}" alt="${it.alt}" loading="lazy" onerror="this.parentElement.style.background='var(--surface-3)';this.remove()">
         ${cat ? `<figcaption class="tag">${cat.label}</figcaption>` : ''}
       </figure>`;
   }).join('');
@@ -279,7 +304,8 @@ function renderGallery() {
 function renderVoices() {
   const t = content.testimonials;
   $('#voicesTitle').textContent = t.headline;
-  $('#voicesSub').textContent = t.sub;
+  if (t.subhead) $("#voicesSubhead").textContent = t.subhead;
+  $("#voicesSub").innerHTML = paras(t.sub, "voices-sub-p");
   // The featured quote is surfaced up top (early proof) — exclude it here so it never repeats.
   const gridItems = (Array.isArray(t.items) ? t.items : []).filter(q => !q.featured);
   const hasReal = gridItems.length > 0;
@@ -315,7 +341,8 @@ function renderAbout() {
     img.parentElement.insertAdjacentHTML('beforeend',
       `<span class="portrait-note">Portrait, supplied by Karine</span>`);
   };
-  $('#aboutBio').textContent = a.bio;
+  if (a.eyebrow) $("#aboutEyebrow").textContent = a.eyebrow;
+  $("#aboutBio").innerHTML = paras(a.bio, "about-bio-p");
   $('#aboutSig').textContent = a.signature;
 }
 
@@ -395,7 +422,7 @@ function renderContact() {
 
 function renderFooter() {
   $('#footerBlurb').textContent =
-    "Intuitive psychic and mediumship readings, Reiki healing and mindset coaching. In person in Gilston, or online worldwide.";
+    "Intuitive psychic mediumship readings and Reiki healing. In person in Gilston, or online worldwide.";
   $('#footerDirect').innerHTML = `
     <li><a href="${bookingSms("I'd like to book a session.")}">Text Karine</a></li>
     <li><a href="${content.booking.phoneHref}">${content.booking.phone}</a></li>
@@ -425,7 +452,7 @@ function renderSchema() {
     "@context": "https://schema.org",
     "@type": "Person",
     name: b.name,
-    jobTitle: "Psychic Medium, Reiki Healer and Mindset Coach",
+    jobTitle: "Psychic Medium and Reiki Healer",
     url: content.schema.url,
     worksFor: { "@type": "ProfessionalService", name: b.name },
     sameAs
@@ -464,6 +491,7 @@ renderIntro();
 renderEarlyProof();
 renderServices();
 renderReikiSupports();
+renderMindsetCoaching();
 renderJourney();
 renderShop();
 renderGallery();
@@ -624,7 +652,7 @@ if (FX) {
     if (now - lastStar < 70) return;
     lastStar = now;
     const s = document.createElement('div');
-    s.className = 'cursor-star' + ((flip++ % 2) ? ' amethyst' : '');
+    s.className = 'cursor-star' + ((flip++ % 2) ? ' rose' : '');
     const size = (4.5 + Math.random() * 4).toFixed(1);
     s.style.left = (e.clientX + (Math.random() - 0.5) * 12) + 'px';
     s.style.top  = (e.clientY + (Math.random() - 0.5) * 12) + 'px';
@@ -675,10 +703,10 @@ setTimeout(() => {
 // ============================================================
 if (window.ScrollTrigger && !REDUCED) {
   gsap.to('#heroContent', {
-    yPercent: -10, opacity: 0.35, ease: 'none',
+    yPercent: -10, opacity: 0.5, ease: 'none',
     scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 0.6 }
   });
-  // Multi-plane depth: the celestial video plane drifts slower than the content.
+  // Multi-plane depth: the hero video plane drifts slower than the content.
   // Overscan (scale) hides the edges while it travels. Desktop only.
   if (FX) {
     gsap.fromTo('#heroMedia',
@@ -717,32 +745,52 @@ function initJourneyTimeline() {
 initJourneyTimeline();
 
 // ============================================================
-// CELESTIAL STARFIELD — canvas 2D, desktop only (replaces WebGL shader)
-// Cheap: drifting + twinkling stars, occasional shooting star. Pauses off-screen.
+// SUNLIT DUST MOTES — canvas 2D, desktop only.
+// The golden-hour answer to the old starfield: soft warm bokeh drifting on
+// the sea breeze, with an occasional slow lens flare. Same cheap scaffold
+// (DPR clamp, deterministic scatter, pauses off-screen); motes are drawn
+// from one pre-rendered sprite rather than a per-frame gradient, so 150 of
+// them still cost one drawImage each.
 // ============================================================
-function initStarfield() {
-  if (REDUCED || NO_HOVER || window.innerWidth < 1025) return;   // mobile shows the static CSS starfield only
-  const canvas = $('#heroStars');
+function initMotes() {
+  if (REDUCED || NO_HOVER || window.innerWidth < 1025) return;   // mobile shows the static CSS glints only
+  const canvas = $('#heroMotes');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  let stars = [], shootT = 0, running = true, w = 0, h = 0;
+  // Colour comes from the --mote design token so a theme change carries here too.
+  const tokenRaw = getComputedStyle(document.documentElement).getPropertyValue('--mote').trim();
+  const rgb = (tokenRaw.match(/\d+\s*,\s*\d+\s*,\s*\d+/) || ['198, 150, 74'])[0];
+
+  // Pre-rendered soft bokeh sprite: warm core fading to nothing at the edge.
+  const SPR = 48;
+  const sprite = document.createElement('canvas');
+  sprite.width = sprite.height = SPR;
+  const sctx = sprite.getContext('2d');
+  const sg = sctx.createRadialGradient(SPR / 2, SPR / 2, 0, SPR / 2, SPR / 2, SPR / 2);
+  sg.addColorStop(0, `rgba(255, 213, 148, 0.95)`);
+  sg.addColorStop(0.35, `rgba(${rgb}, 0.55)`);
+  sg.addColorStop(1, `rgba(${rgb}, 0)`);
+  sctx.fillStyle = sg; sctx.fillRect(0, 0, SPR, SPR);
+
+  let motes = [], flareT = 0, running = true, w = 0, h = 0;
   const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
 
   function resize() {
     w = canvas.clientWidth; h = canvas.clientHeight;
     canvas.width = Math.max(1, w * DPR); canvas.height = Math.max(1, h * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    const count = Math.min(150, Math.floor(w * h / 9000));
-    stars = Array.from({ length: count }, (_, i) => ({
+    const count = Math.min(110, Math.floor(w * h / 13000));
+    motes = Array.from({ length: count }, (_, i) => ({
       x: (i * 97.13) % w,                         // deterministic scatter (no Math.random dependency)
       y: (i * 61.7) % h,
-      r: 0.4 + ((i * 13) % 10) / 10 * 1.1,
-      base: 0.25 + ((i * 7) % 10) / 10 * 0.5,
-      tw: 0.6 + ((i * 3) % 10) / 10 * 1.6,        // twinkle speed
+      r: 2.2 + ((i * 13) % 10) / 10 * 6,          // bokeh orbs, not pin-prick stars
+      base: 0.10 + ((i * 7) % 10) / 10 * 0.26,
+      tw: 0.25 + ((i * 3) % 10) / 10 * 0.7,       // slow breathing, not a twinkle
       ph: (i % 12) / 12 * Math.PI * 2,            // phase
-      drift: 0.02 + ((i * 5) % 10) / 10 * 0.05
+      drift: 0.05 + ((i * 5) % 10) / 10 * 0.10,   // sideways on the breeze
+      bob: 0.12 + ((i * 11) % 10) / 10 * 0.22     // lazy vertical float
     }));
   }
   const ro = new ResizeObserver(resize); ro.observe(canvas); resize();
@@ -750,63 +798,37 @@ function initStarfield() {
   const sObs = new IntersectionObserver(es => { running = es[0].isIntersecting; });
   sObs.observe($('#hero'));
 
-  let shoot = null;
+  let flare = null;
   function frame(t) {
     if (running) {
       const time = t * 0.001;
       ctx.clearRect(0, 0, w, h);
-      for (const s of stars) {
-        const a = s.base * (0.55 + 0.45 * Math.sin(time * s.tw + s.ph));
-        s.x -= s.drift; if (s.x < -2) s.x = w + 2;   // gentle leftward drift
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(246, 242, 251, ${a.toFixed(3)})`;
-        ctx.fill();
+      for (const m of motes) {
+        const a = m.base * (0.6 + 0.4 * Math.sin(time * m.tw + m.ph));
+        m.x -= m.drift; if (m.x < -m.r) m.x = w + m.r;      // gentle leftward drift
+        const y = m.y + Math.sin(time * m.bob + m.ph) * 6;  // float on the air
+        ctx.globalAlpha = a;
+        ctx.drawImage(sprite, m.x - m.r, y - m.r, m.r * 2, m.r * 2);
       }
-      // Occasional shooting star
-      if (!shoot && time > shootT) {
-        shootT = time + 6 + (Math.floor(time) % 5);
-        shoot = { x: w * 0.15 + (time % 1) * w * 0.6, y: h * 0.1 + (time % 0.7) * h * 0.3, life: 0 };
+      ctx.globalAlpha = 1;
+      // Occasional slow lens flare drifting through the sun path
+      if (!flare && time > flareT) {
+        flareT = time + 9 + (Math.floor(time) % 6);
+        flare = { x: w * 0.42 + (time % 1) * w * 0.24, y: h * 0.34 + (time % 0.7) * h * 0.2, life: 0 };
       }
-      if (shoot) {
-        shoot.life += 0.02; shoot.x += 6; shoot.y += 2.2;
-        const gA = Math.max(0, 1 - shoot.life);
-        const grad = ctx.createLinearGradient(shoot.x, shoot.y, shoot.x - 60, shoot.y - 22);
-        grad.addColorStop(0, `rgba(232, 197, 131, ${(0.8 * gA).toFixed(3)})`);
-        grad.addColorStop(1, 'rgba(232, 197, 131, 0)');
-        ctx.strokeStyle = grad; ctx.lineWidth = 1.4;
-        ctx.beginPath(); ctx.moveTo(shoot.x, shoot.y); ctx.lineTo(shoot.x - 60, shoot.y - 22); ctx.stroke();
-        if (shoot.life >= 1) shoot = null;
+      if (flare) {
+        flare.life += 0.0045; flare.x += 0.22; flare.y -= 0.09;
+        const fa = Math.sin(Math.min(1, flare.life) * Math.PI) * 0.30;   // fade in then out
+        const R = 90;
+        ctx.globalAlpha = Math.max(0, fa);
+        ctx.drawImage(sprite, flare.x - R, flare.y - R, R * 2, R * 2);
+        ctx.globalAlpha = 1;
+        if (flare.life >= 1) flare = null;
       }
     }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-}
-
-// ============================================================
-// VIDEO FEATURE — real pendulum footage (muted loop; poster under reduced-motion)
-// ============================================================
-function renderVideoFeature() {
-  const v = content.videoFeature;
-  const section = $('#videoFeature');
-  if (!v || !section) { if (section) section.hidden = true; return; }
-  $('#vfEyebrow').innerHTML = `<span class="dot"></span> ${v.eyebrow}`;
-  $('#vfEmotional').innerHTML = v.emotional;
-  $('#vfCaption').textContent = v.caption;
-  const media = $('#videoFeatureMedia');
-  if (v.poster) media.style.backgroundImage = `url(${v.poster})`;
-  if (!REDUCED && v.video) {
-    const vid = document.createElement('video');
-    vid.className = 'vf-video';
-    vid.muted = true; vid.defaultMuted = true; vid.loop = true; vid.autoplay = true; vid.playsInline = true;
-    vid.setAttribute('muted', ''); vid.setAttribute('playsinline', ''); vid.setAttribute('autoplay', '');
-    vid.setAttribute('loop', ''); vid.setAttribute('preload', 'metadata');
-    if (v.poster) vid.poster = v.poster;
-    vid.src = v.video;
-    media.appendChild(vid);
-    const p = vid.play(); if (p && typeof p.catch === 'function') p.catch(() => {});
-  }
 }
 
 // ============================================================
@@ -844,7 +866,7 @@ function bookingSessions() {
 }
 function sessionLabel(s) {
   if (!s) return 'a session';
-  return `${s.title}${s.duration ? ' · ' + s.duration : ''}${s.enquire || !s.price ? '' : ' (' + currencyAU(s.price) + ')'}`;
+  return `${s.title}${s.duration ? ' · ' + s.duration : ''}${s.enquire || !s.price ? '' : ' (' + priceAUD(s.price) + ')'}`;
 }
 function renderBooking() {
   const wrap = $('#bkSessions');
@@ -857,14 +879,48 @@ function renderBooking() {
       <span class="bk-session-main">
         <span class="bk-session-title">${s.title}</span>
         ${s.duration ? `<span class="bk-session-dur">${s.duration}</span>` : ''}
+        ${s.inPersonOnly ? `<span class="bk-session-note">In person only</span>` : ''}
       </span>
-      <span class="bk-session-price">${s.enquire || !s.price ? 'Enquire' : currencyAU(s.price)}</span>
+      <span class="bk-session-price">${s.enquire || !s.price ? 'Enquire' : priceAUD(s.price)}</span>
     </label>`).join('');
+
+  const b = content.booking;
+
+  // Platform choice — only relevant once Online is picked.
+  $('#bkPlatformOpts').innerHTML = (b.platforms || []).map((p, i) => `
+    <label class="bk-radio"><input type="radio" name="platform" value="${p}" ${i === 0 ? 'checked' : ''}><span>${p}</span></label>`).join('');
+
+  // Day × time-of-day grid. Karine asked for specific slots, not a free-text
+  // "Saturday morning" - she wants to see exactly which days suit.
+  $('#bkWhen').innerHTML = `
+    <div class="bk-when-head"><span></span>${(b.dayParts || []).map(p => `<span>${p}</span>`).join('')}</div>
+    ${(b.days || []).map(d => `
+      <div class="bk-when-row">
+        <span class="bk-when-day">${d}</span>
+        ${(b.dayParts || []).map(p => `
+          <label class="bk-slot">
+            <input type="checkbox" name="when" value="${d} ${p.toLowerCase()}" aria-label="${d} ${p.toLowerCase()}">
+            <span></span>
+          </label>`).join('')}
+      </div>`).join('')}`;
+
+  $('#bkFocus').placeholder = b.focusPlaceholder || '';
+  $('#bkSelfie').textContent = b.selfieNote || '';
+  if (b.payment) {
+    $('#bkPayment').innerHTML = `
+      <h3>${b.payment.heading}</h3>
+      <ul>
+        <li>${b.payment.inPerson}</li>
+        <li>${b.payment.online}</li>
+        <li>${b.payment.methods}</li>
+      </ul>`;
+  }
 
   const radios = $$('#bkFormat input');
   const online = radios.find(r => /Online/i.test(r.value));
   const inperson = radios.find(r => /person/i.test(r.value));
   const hint = $('#bkFormatHint');
+  const platformBox = $('#bkPlatform');
 
   function applySelection() {
     const sel = wrap.querySelector('input[name="session"]:checked');
@@ -878,10 +934,13 @@ function renderBooking() {
     } else if (online) {
       online.disabled = false;
       online.closest('.bk-radio').classList.remove('is-disabled');
-      hint.textContent = 'Readings and mindset coaching are available in person, or online worldwide.';
+      hint.textContent = 'Readings are available in person, or online worldwide.';
     }
+    // Platform only matters for an online session.
+    if (platformBox) platformBox.hidden = !(online && online.checked && !online.disabled);
   }
   wrap.addEventListener('change', applySelection);
+  $('#bkFormat').addEventListener('change', applySelection);
   applySelection();
 
   // Pre-select a session when a service card's "Book" button is tapped.
@@ -896,32 +955,77 @@ function renderBooking() {
     e.preventDefault();
     const sel = wrap.querySelector('input[name="session"]:checked');
     const s = sessions.find(x => x.id === (sel && sel.value));
-    const fmt = (form.querySelector('input[name="format"]:checked') || {}).value || '';
-    const when = form.when.value.trim();
+    let fmt = (form.querySelector('input[name="format"]:checked') || {}).value || '';
+    // Fold the chosen platform into the format line when the session is online.
+    const isOnline = /online/i.test(fmt);
+    const platform = (form.querySelector('input[name="platform"]:checked') || {}).value || '';
+    if (isOnline && platform) fmt = `Online via ${platform}`;
+    const when = $$('input[name="when"]:checked', form).map(i => i.value).join(', ');
     const focus = form.focus.value.trim();
     const questions = form.questions.value.trim();
     const name = form.name.value.trim();
     const phone = form.phone.value.trim();
     let body = `Hi Karine! I'd like to book: ${sessionLabel(s)}. Format: ${fmt}.`;
-    if (when) body += ` Preferred days/times: ${when}.`;
+    if (when) body += ` Times that suit me: ${when}.`;
     if (focus) body += ` I'd love you to focus on: ${focus}.`;
     if (questions) body += ` My questions: ${questions}.`;
-    body += ` My name: ${name || '-'}${phone ? ', mobile: ' + phone : ''}.`;
+    body += ` My name: ${name || '-'}${phone ? ', phone: ' + phone : ''}.`;
+    body += ` (Selfie attached.)`;
     window.location.href = `${content.booking.smsHref}?&body=${encodeURIComponent(body)}`;
   });
 }
 
 // ============================================================
-// WAXING-MOON SCROLL DIAL — the celestial progress motif (desktop / FX)
-// A gold moon that fills with light from new → full as you journey down.
+// SCROLL PENDULUM — the signature moment. Karine's REAL pendulum hangs in
+// the welcome band and swings from the momentum of your scroll, then settles
+// back to true when you stop. Damped spring, not a simulation: the pivot only
+// moves vertically in reality, so this is a designed response, tuned to feel
+// like the pendulum is reading you.
+//
+// ⚠️ Integrated on the SAME gsap.ticker that drives Lenis. Never add a second
+// requestAnimationFrame here — that is the mobile-smoothness ship blocker.
 // ============================================================
-function initMoonDial() {
+function initScrollPendulum() {
+  const host = $('#welcome');
+  if (!host || REDUCED || !window.gsap) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'swing';
+  wrap.setAttribute('aria-hidden', 'true');
+  wrap.innerHTML = '<img class="swing-img" src="assets/hero/pendulum-cutout.webp" alt="" decoding="async">';
+  host.appendChild(wrap);
+
+  const MAX = 15;               // degrees of travel either side
+  let angle = 0, vel = 0, smoothed = 0, lastY = window.scrollY, visible = false;
+
+  const io = new IntersectionObserver(es => { visible = es[0].isIntersecting; }, { rootMargin: '120px' });
+  io.observe(host);
+
+  gsap.ticker.add(() => {
+    const y = window.scrollY;
+    const dy = y - lastY;
+    lastY = y;
+    if (!visible) return;                       // no work while it is off-screen
+    smoothed += (dy - smoothed) * 0.2;          // ease the raw delta so it never jitters
+    const target = Math.max(-MAX, Math.min(MAX, smoothed * 0.55));
+    vel += (target - angle) * 0.06;             // spring toward where the scroll pushes it
+    vel *= 0.9;                                 // damping, so it settles instead of ringing
+    angle += vel;
+    wrap.style.setProperty('--a', angle.toFixed(3) + 'deg');
+  });
+}
+
+// ============================================================
+// RISING-SUN SCROLL DIAL — the golden-hour progress motif (desktop / FX)
+// A gold sun that rises as you journey down the page.
+// ============================================================
+function initSunDial() {
   if (!FX) return;
   const dial = document.createElement('div');
-  dial.className = 'moon-dial'; dial.setAttribute('aria-hidden', 'true');
-  dial.innerHTML = '<div class="moon-disc"><div class="moon-shadow"></div></div>';
+  dial.className = 'sun-dial'; dial.setAttribute('aria-hidden', 'true');
+  dial.innerHTML = '<div class="sun-disc"><div class="sun-shadow"></div></div>';
   document.body.appendChild(dial);
-  const shadow = dial.querySelector('.moon-shadow');
+  const shadow = dial.querySelector('.sun-shadow');
   requestAnimationFrame(() => dial.classList.add('is-ready'));
   function update() {
     const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -934,8 +1038,11 @@ function initMoonDial() {
 }
 
 // ============================================================
-// CONSTELLATION — a "connect the stars" line-draw behind the closing CTA.
-// Draws once as it enters view; static + visible under reduced motion.
+// SHORELINE — a flowing horizon line drawn behind the closing CTA.
+// The daylight replacement for the old constellation: same draw-on
+// machinery, a curve instead of a star map, with three sun glints
+// resting on it. Draws once as it enters view; static + visible
+// under reduced motion.
 // ============================================================
 function initConstellation() {
   const cta = $('#cta');
@@ -946,11 +1053,15 @@ function initConstellation() {
   svg.setAttribute('viewBox', '0 0 1200 520');
   svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
   svg.setAttribute('aria-hidden', 'true');
-  const pts = [[130,150],[330,90],[520,200],[770,120],[960,220],[1080,110]];
-  const d = 'M' + pts.map(p => p.join(' ')).join(' L ');
+  // A long, lazy shoreline sweep. The glints sit ON the curve, so if you
+  // retune the bezier move these with it.
+  // Sits low in the viewBox so it reads as a horizon under the copy rather
+  // than a line through it. Glints are points ON the curve; move them with it.
+  const d = 'M -40 470 C 220 412, 430 522, 660 462 S 1010 372, 1240 430';
+  const glints = [[321, 467], [660, 462], [950, 402]];
   svg.innerHTML =
     `<path class="c-line" d="${d}"></path>` +
-    pts.map(p => `<circle class="c-star" cx="${p[0]}" cy="${p[1]}" r="3.2"></circle>`).join('');
+    glints.map(p => `<circle class="c-star" cx="${p[0]}" cy="${p[1]}" r="3.6"></circle>`).join('');
   cta.insertBefore(svg, cta.firstChild);
   const line = svg.querySelector('.c-line');
   if (line.getTotalLength) line.style.setProperty('--len', Math.ceil(line.getTotalLength()));
@@ -963,9 +1074,10 @@ function initConstellation() {
 // ============================================================
 // KICK OFF
 // ============================================================
-initStarfield();
-initMoonDial();
+initMotes();
+initSunDial();
 initConstellation();
+initScrollPendulum();
 
 runOverture().then(() => { if (window.ScrollTrigger) ScrollTrigger.refresh(); });
 

@@ -1,6 +1,6 @@
 // ============================================================
 // KARINE S. MATTHEWS — SINGLE SOURCE OF TRUTH
-// Psychic Medium · Reiki Healer · Mindset Coach · Gilston, QLD
+// Psychic Medium · Reiki Healer · Gilston, QLD
 // ------------------------------------------------------------
 // Rename / re-price / re-wire the whole site from this file.
 // Booking is SMS-first (mirrors the Goldy booking.mode:"sms" pattern):
@@ -27,13 +27,17 @@ export const content = Object.freeze({
   },
 
   hero: {
-    eyebrow: "Psychic Medium · Reiki Healer · Mindset Coach",
+    // ⭐ KARINE'S OWN WORDING, taken verbatim from the reference banner she sent
+    // on 2026-08-04. Do not reword any of these four lines without asking her.
+    kicker: "Welcome to",                                            // small gold italic, sits above the name
     // Line 2 renders as the gold-foil serif emotional accent (the <em> is clipped-gradient).
     headlineLines: [
-      "Welcome, Beautiful Souls.",
-      "Come home to your <em>truth</em>."
+      "Reconnect with",
+      "<em>Karine S. Matthews</em>"
     ],
-    sub: "Reconnect with your truth, release what feels heavy, and find clarity, peace and direction. Every reading and healing is guided by intuition and Spirit, and held with deep compassion. In person in Gilston, or online anywhere in the world.",
+    // The four pillars from her banner, rendered as gold-separated small caps.
+    tagline: ["Psychic Medium", "Intuitive Guidance", "Spiritual Healing", "Clarity"],
+    sub: "Guiding you toward clarity, healing, and connection.",
     primaryCta: { label: "Book a session", href: "#book" },        // scrolls to the booking builder
     secondaryCta: { label: "Text Karine", intent: "sms" },         // resolves to the booking SMS link at render
     // Honest, above-the-fold reassurances (rendered as small starred cues under the CTAs).
@@ -43,8 +47,11 @@ export const content = Object.freeze({
       "Warm, private and never rushed",
       "I reply personally, usually within a day"
     ],
-    // Cinematic hero: Karine's real pendulum-over-crystals footage, graded dark,
-    // with the celestial aura + starfield layered on top. Reduced-motion → poster still.
+    // Cinematic hero: Karine's REAL clear-crystal chamber pendulum (source photo
+    // IMG_2436, rotated upright so it hangs true - the product itself is untouched),
+    // relit into a golden-hour beach and given a gentle swing. Seamless ping-pong
+    // loop baked into the file, since the player just sets loop=true.
+    // Reduced-motion → poster still.
     video: "assets/hero/hero.mp4",
     poster: "assets/hero/hero-poster.jpg"
   },
@@ -63,20 +70,14 @@ export const content = Object.freeze({
   },
 
   // Full-bleed cinematic band: Karine's own pendulum swinging over her tarot table.
-  videoFeature: {
-    eyebrow: "Inside the space",
-    emotional: "This is where we sit together. <em>Come as you are.</em>",
-    video: "assets/space/pendulum.mp4",
-    poster: "assets/space/pendulum-poster.jpg",
-    caption: "In person in Gilston, or online from anywhere in the world."
-  },
-
   services: [
     {
       id: "readings",
-      name: "Intuitive Psychic & Mediumship Readings",
+      // ⭐ KARINE'S OWN COPY, verbatim from her final text on 2026-08-04. Do not reword.
+      name: "Intuitive Psychic Mediumship Readings",
+      tagline: "Reconnect with Clarity, Guidance & Spirit.",
       modality: "In person in Gilston, or online via FaceTime, WhatsApp or Zoom",
-      blurb: "Come away with clarity, direction and the comfort of a message meant for you. Each reading blends psychic insight, mediumship, tarot and pendulum work to bring through guidance for your path. Arrive with a question, or simply open to what Spirit wants you to hear.",
+      blurb: "Every reading is a heart-centred, intuitive experience designed to bring you clarity, guidance, and healing. Blending psychic intuition, mediumship, tarot, and the pendulum, I connect with your energy and Spirit to share the messages you most need to hear at this point in your journey. Whether you're seeking answers, reassurance, or direction, you'll receive honest guidance delivered with compassion and care.\n\nYou'll walk away feeling more empowered, with greater clarity, renewed confidence, a sense of peace, and a deeper understanding of the path ahead.",
       options: [
         { label: "30 minutes", price: 90 },
         { label: "60 minutes", price: 150 }
@@ -85,38 +86,40 @@ export const content = Object.freeze({
     },
     {
       id: "reiki",
-      name: "Intuitive Reiki Healing",
+      name: "Intuitive Reiki Healings",
       modality: "In person in Gilston only",
-      blurb: "Leave lighter, calmer and back home in your body. Gentle, intuitive energy healing that clears blockages, settles the nervous system and rebalances your chakras. You rest, fully clothed, while grounding energy is drawn to where you need it most.",
+      blurb: "My intuitive Reiki healing sessions are a gentle yet powerful way to restore balance to your mind, body, and spirit. Working with your energy and guided by intuition, I help clear energetic blockages, promote deep relaxation, and support your body's natural healing process.\n\nYou'll walk away feeling lighter, calmer, more balanced, energetically refreshed, and deeply reconnected to yourself.",
       options: [
         { label: "60 minutes", price: 110 }
       ],
       supportsRef: "reiki-supports",     // links to the "what Reiki may support" section
       cta: { label: "Book Reiki healing", intro: "I'd like to book a Reiki healing session." }
     },
-    {
-      id: "coaching",
-      name: "Mindset Coaching",
-      modality: "In person or online. Enquire for details.",
-      blurb: "Reconnect with your worth and move toward the life your soul is calling you into. Compassionate, intuition-led coaching to help you shift limiting patterns and take your next step with clarity. Every session is shaped around you.",
-      options: [],                        // no invented price
-      enquireOnly: true,
-      cta: { label: "Enquire about coaching", intro: "I'd like to enquire about mindset coaching." }
-    }
   ],
 
+  // ⭐ Mindset coaching is a BONUS woven into a session when it is needed —
+  // NOT a separate service and NOT separately bookable. Karine was explicit
+  // (2026-08-04). Her copy, verbatim.
+  mindsetCoaching: {
+    eyebrow: "Included when you need it",
+    title: "Mindset Coaching",
+    emotional: "Not a separate session. <em>A part of yours, when Spirit guides it.</em>",
+    blurb: "Mindset coaching is naturally woven into my sessions whenever Spirit guides me to, and when I feel it's needed to support your journey. Sometimes the messages you receive are not only about gaining clarity, but also about creating lasting change by recognising limiting beliefs, shifting old patterns, and seeing things from a new perspective.\n\nAt times, I may give you simple exercises, reflections, or practical tasks to complete between sessions. These are designed to help you strengthen your mindset, work through the challenges you're experiencing, and gently move forward with greater confidence, self-awareness, and empowerment.\n\nYou'll walk away with practical tools, a fresh perspective, and the confidence to create positive, lasting change in your life."
+  },
+
   reikiSupports: {
-    eyebrow: "How Reiki may support you",
+    eyebrow: "Reiki may help to",
     emotional: "Healing is not forcing. <em>It is remembering how to soften.</em>",
+    // Regulatory requirement — do NOT remove or soften this line.
     note: "Reiki is a complement to, not a replacement for, medical care.",
+    // ⭐ KARINE'S OWN LIST, verbatim and in her order (2026-08-04).
     items: [
-      "Stress and anxiety",
-      "Emotional healing",
-      "Mental overwhelm",
-      "Sleep disturbances",
-      "Recovery from illness or injury",
-      "Energetic balance",
-      "Relaxation and wellbeing"
+      "Reduce stress and encourage deep relaxation",
+      "Support emotional healing and inner calm",
+      "Restore balance to your mind, body, and spirit",
+      "Clear energetic blockages",
+      "Rebalance and align your chakras",
+      "Promote a greater sense of clarity, grounding, and wellbeing"
     ]
   },
 
@@ -131,7 +134,8 @@ export const content = Object.freeze({
     ],
     modes: [
       { id: "inperson", glyph: "home",  title: "In person, Gilston", body: "A quiet, sacred room in the Gold Coast Hinterland. Readings, Reiki and coaching. Reiki healing is in person only." },
-      { id: "online",   glyph: "globe", title: "Online, worldwide",  body: "Readings and mindset coaching over FaceTime, WhatsApp or Zoom. The connection through Spirit is not limited by distance." }
+      // Mindset coaching deliberately NOT listed as an online option — Karine asked (2026-08-04).
+      { id: "online",   glyph: "globe", title: "Online, worldwide",  body: "Readings over FaceTime, WhatsApp or Zoom. The connection through Spirit is not limited by distance." }
     ]
   },
 
@@ -179,8 +183,10 @@ export const content = Object.freeze({
   },
 
   testimonials: {
-    headline: "Words from souls I have sat with.",
-    sub: "In their own words, shared with permission and kept anonymous for privacy.",
+    // ⭐ KARINE'S OWN INTRO, verbatim (2026-08-04).
+    headline: "Client Reflections",
+    subhead: "Shared from the Heart, in Their Own Words",
+    sub: "The reflections below have been generously shared with permission by those I've been blessed to read for and support through intuitive psychic mediumship readings and Reiki healing sessions. To honour their privacy, all testimonials have been kept anonymous.\n\nI am deeply grateful for the trust each person has placed in me and for allowing me to be part of their journey. I hope their experiences offer you a glimpse into the clarity, healing, and connection that is possible.",
     // Factually TRUE proof points, shown until real client quotes exist.
     proofPoints: [
       { metric: "Intuition-led",      label: "every session",  sub: "Guided by Spirit, tarot and pendulum, never a script." },
@@ -199,9 +205,11 @@ export const content = Object.freeze({
 
   about: {
     name: "Karine S. Matthews",
-    role: "Psychic Medium · Reiki Healer · Mindset Coach",
+    role: "Psychic Medium · Reiki Healer",
+    eyebrow: "The heart behind every session...",
     photo: "assets/about/karine.jpg",                // REAL portrait supplied
-    bio: "I am Karine, and my work is guided by intuition and Spirit. For as long as I can remember I have felt energy and heard what sits beneath the surface. Now, from my sacred room in Gilston, I hold space for others to release what is heavy, reconnect with their truth, and find clarity, peace and direction. Every soul who comes to me is met with compassion, grounding energy and divine guidance.",  // CONFIRM / polish with Karine
+    // ⭐ KARINE'S OWN BIO, verbatim and approved by her (2026-08-04). Do not reword.
+    bio: "Hello, I'm Karine.\n\nMy work is guided by intuition, Spirit, and a deep passion for helping others reconnect with themselves. For as long as I can remember, I've been able to sense energy and perceive what lies beneath the surface. It is a gift I feel truly honoured to share.\n\nFrom my peaceful sacred space in Gilston on the Gold Coast, I hold a safe, supportive space for people to release what no longer serves them, reconnect with their inner truth, and gain the clarity, healing, and direction they seek.\n\nEvery person who walks through my door is welcomed with compassion, grounded energy, and heartfelt guidance, meeting you exactly where you are on your journey while gently helping you move forward with greater confidence, peace, and purpose.",
     credentials: [],                                 // Reiki level, mediumship training — CONFIRM
     signature: "— Karine 🦋"
   },
@@ -224,7 +232,7 @@ export const content = Object.freeze({
     cards: [
       { glyph: "moon",   title: "Full-moon wisdom",          body: "Lunar energy insights and rituals as each cycle turns." },
       { glyph: "portal", title: "Portal updates",            body: "Guidance for the energetic gateways as they open." },
-      { glyph: "cards",  title: "Daily collective readings", body: "Tune in for the day's message across TikTok and Instagram." },
+      { glyph: "cards",  title: "Daily collective readings", body: "Tune in for the day's message across TikTok, Instagram and Facebook." },
       { glyph: "gift",   title: "Spiritual tools & offers",  body: "Pendulums, practices and gentle offers for your journey." }
     ]
   },
@@ -242,11 +250,16 @@ export const content = Object.freeze({
     },
     {
       q: "Do you offer sessions online?",
-      a: "Yes. Readings and mindset coaching are available online worldwide via FaceTime, WhatsApp or Zoom. Reiki healing is in person only, in Gilston."
+      // Mindset coaching deliberately removed here — Karine asked (2026-08-04).
+      a: "Yes. Readings are available online worldwide via FaceTime, WhatsApp or Zoom. Reiki healing is in person only, in Gilston."
     },
     {
       q: "What happens in a reading?",
       a: "I blend psychic insight, mediumship, tarot and pendulum work to bring through guidance and messages for your path. You are welcome to bring a question, or simply stay open to what Spirit wants you to hear."
+    },
+    {
+      q: "Can I come with a friend?",
+      a: "I ask that readings are one-on-one only. This helps me create a quiet, private space where I can connect fully with your energy without distractions."
     },
     {
       q: "What is Reiki like?",
@@ -254,7 +267,7 @@ export const content = Object.freeze({
     },
     {
       q: "How much do sessions cost?",
-      a: "Readings are 90 dollars for 30 minutes or 150 dollars for 60 minutes. Reiki healing is 110 dollars for 60 minutes. Mindset coaching is shaped around you, so please enquire."
+      a: "Readings are $90 AUD for 30 minutes or $150 AUD for 60 minutes. Reiki healing is $110 AUD for 60 minutes. Mindset coaching is included in your session when it is needed, at no extra cost."
     },
     {
       q: "Where are you based?",
@@ -266,7 +279,8 @@ export const content = Object.freeze({
   cta: {
     eyebrow: "Ready?",
     emotional: "Your soul has been waiting. <em>Let's begin.</em>",
-    body: "I keep my bookings intimate and unhurried, so each soul has my full presence. If something in you feels ready, reach out today and we will find a time that feels right. In person in Gilston, or online from wherever you are."
+    // ⭐ KARINE'S OWN CLOSING COPY, verbatim (2026-08-04).
+    body: "Every reading and healing session is held with intention, compassion, and presence. I only take a limited number of bookings so each person receives the time and energy they deserve. If you're feeling called to connect, trust that nudge. Reach out today, and we'll find the perfect time for your session. Join me in person in Gilston or online from wherever you are."
   },
 
   booking: {
@@ -275,7 +289,29 @@ export const content = Object.freeze({
     phone: "0404 098 706",
     phoneHref: "tel:+61404098706",
     email: "hello@karinematthews.com.au",            // CONFIRM — desktop / shop fallback
-    responseTimeLabel: "I reply personally, usually within a day."
+    responseTimeLabel: "I reply personally, usually within a day.",
+
+    // Karine asked (2026-08-04) that prices read like "$90 AUD".
+    // The "$" already comes from currencyAU() in script.js; this is the currency
+    // label appended after the amount. Numeric prices are unchanged.
+    priceSuffix: "AUD",
+
+    // ⭐ Karine's booking requirements, from her review on 2026-08-04.
+    // These are her instructions - do not simplify them away.
+    days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    dayParts: ["Morning", "Afternoon", "Evening"],
+    platforms: ["FaceTime", "WhatsApp", "Zoom"],     // shown only when Online is chosen
+    focusPlaceholder: "For example, any particular area of your life you would like me to look at: personal, relationships, work or career.",
+    // The SMS app lets you attach a photo before sending, so this is a real
+    // instruction, not a promise the site cannot keep.
+    selfieNote: "Before you hit send, please attach a recent selfie. I tune into your energy from it and see what Spirit may reveal ahead of your session.",
+    payment: {
+      heading: "Payment",
+      inPerson: "In person: you can pay cash on the day.",
+      online: "Online: payment needs to be in my account and cleared before your session starts.",
+      // No account numbers on a public page - she sends them on confirmation.
+      methods: "I accept PayID or bank transfer, and I will send you my details once we have confirmed your time."
+    }
   },
 
   // Base LocalBusiness node. renderSchema() assembles this + a Person node +
@@ -283,7 +319,7 @@ export const content = Object.freeze({
   schema: {
     "@type": ["ProfessionalService", "HealthAndBeautyBusiness"],
     name: "Karine S. Matthews",
-    description: "Psychic medium, Reiki healer and mindset coach in Gilston, Gold Coast Hinterland. Intuitive readings, energy healing and coaching, in person and online worldwide.",
+    description: "Psychic medium and Reiki healer in Gilston, Gold Coast Hinterland. Intuitive psychic mediumship readings in person and online worldwide, and Reiki healing in person.",
     priceRange: "$$",
     image: "https://karinematthews.com.au/assets/og/og-image.jpg",   // CONFIRM domain
     url: "https://karinematthews.com.au/",                           // CONFIRM domain
