@@ -18,7 +18,9 @@ export const content = Object.freeze({
     tagline: "Where your energy, intuition, and soul come home.",
     phone: "0404 098 706",
     phoneHref: "tel:+61404098706",
-    email: "hello@karinematthews.com.au",            // CONFIRM
+    // ⭐ Email removed at Karine's request (2026-08-10): "Remove email sections".
+    // The site is SMS-first and the old address was a dead placeholder.
+    // Do not re-add an email channel without a real, monitored mailbox from her.
     region: "Gilston, Gold Coast Hinterland, QLD",
     servesInPerson: "Gilston, Gold Coast Hinterland",
     servesOnline: "Online worldwide",
@@ -59,14 +61,20 @@ export const content = Object.freeze({
   intro: {
     eyebrow: "Why you're here",
     lead: "Welcome, Beautiful Souls.",
-    // Karine's own, proven questions (verbatim from her banner) — the longing that brings people to her.
+    // ⭐ KARINE'S OWN "WHY YOU'RE HERE" COPY, verbatim (2026-08-10). This
+    // REPLACES the shorter banner questions used until now — her three
+    // questions are full sentences and the two closing paragraphs are new.
+    // Do not reword, shorten or Americanise any of it.
     questions: [
-      "Ever curious about what the future holds?",
-      "Wish to connect with a loved one who has passed on?",
-      "Seeking guidance for what tomorrow brings?"
+      "Have you ever wondered what the future may hold?",
+      "Longing to reconnect with a loved one in spirit?",
+      "Searching for clarity, guidance, or reassurance for the path ahead?"
     ],
-    emotional: "Whatever drew you here today, <em>you are in the right place.</em>",
-    body: "My sessions are a gentle, sacred space to set down what feels heavy, hear what your soul is whispering, and step forward with clarity and peace. Whether you sit with me in Gilston or we connect online from anywhere in the world, you are held with care from your very first message."
+    // Her fourth line, split at her own comma to carry the existing gold-foil
+    // <em> accent. The words are hers; only the <em> placement is ours.
+    emotional: "Whatever has brought you here today, <em>you are exactly where you're meant to be.</em>",
+    // Two paragraphs — rendered through paras() so her break survives.
+    body: "My sessions offer a gentle, sacred space where you can lay down what feels heavy, reconnect with your inner truth, and receive the guidance your soul is ready to hear.\n\nWhether we meet in person in Gilston or connect online from anywhere in the world, you'll be held with compassion, honesty, and care from the very first message."
   },
 
   // Full-bleed cinematic band: Karine's own pendulum swinging over her tarot table.
@@ -77,6 +85,10 @@ export const content = Object.freeze({
       name: "Intuitive Psychic Mediumship Readings",
       tagline: "Reconnect with Clarity, Guidance & Spirit.",
       modality: "In person in Gilston, or online via FaceTime, WhatsApp or Zoom",
+      // Her own photo of the tarot spread on the reading table. Sits at the head
+      // of the card so the sessions section is not a wall of text (2026-08-10).
+      image: "assets/space/02-tarot-spread.jpg",
+      imageAlt: "A tarot spread laid out on velvet on Karine's reading table",
       blurb: "Every reading is a heart-centred, intuitive experience designed to bring you clarity, guidance, and healing. Blending psychic intuition, mediumship, tarot, and the pendulum, I connect with your energy and Spirit to share the messages you most need to hear at this point in your journey. Whether you're seeking answers, reassurance, or direction, you'll receive honest guidance delivered with compassion and care.\n\nYou'll walk away feeling more empowered, with greater clarity, renewed confidence, a sense of peace, and a deeper understanding of the path ahead.",
       options: [
         { label: "30 minutes", price: 90 },
@@ -88,6 +100,8 @@ export const content = Object.freeze({
       id: "reiki",
       name: "Intuitive Reiki Healings",
       modality: "In person in Gilston only",
+      image: "assets/space/04-reiki-table.jpg",
+      imageAlt: "Karine's Reiki healing table set with a line of chakra stones",
       blurb: "My intuitive Reiki healing sessions are a gentle yet powerful way to restore balance to your mind, body, and spirit. Working with your energy and guided by intuition, I help clear energetic blockages, promote deep relaxation, and support your body's natural healing process.\n\nYou'll walk away feeling lighter, calmer, more balanced, energetically refreshed, and deeply reconnected to yourself.",
       options: [
         { label: "60 minutes", price: 110 }
@@ -100,12 +114,47 @@ export const content = Object.freeze({
   // ⭐ Mindset coaching is a BONUS woven into a session when it is needed —
   // NOT a separate service and NOT separately bookable. Karine was explicit
   // (2026-08-04). Her copy, verbatim.
-  mindsetCoaching: {
-    eyebrow: "Included when you need it",
-    title: "Mindset Coaching",
-    emotional: "Not a separate session. <em>A part of yours, when Spirit guides it.</em>",
-    blurb: "Mindset coaching is naturally woven into my sessions whenever Spirit guides me to, and when I feel it's needed to support your journey. Sometimes the messages you receive are not only about gaining clarity, but also about creating lasting change by recognising limiting beliefs, shifting old patterns, and seeing things from a new perspective.\n\nAt times, I may give you simple exercises, reflections, or practical tasks to complete between sessions. These are designed to help you strengthen your mindset, work through the challenges you're experiencing, and gently move forward with greater confidence, self-awareness, and empowerment.\n\nYou'll walk away with practical tools, a fresh perspective, and the confidence to create positive, lasting change in your life."
-  },
+  // Things INCLUDED in a session rather than sold separately. Rendered as
+  // inclusion panels under the services grid, never as bookable service cards.
+  // Add another object here and it renders itself — no code change needed.
+  inclusions: [
+    {
+      id: "mindset",
+      eyebrow: "Included when you need it",
+      title: "Mindset Coaching",
+      emotional: "Not a separate session. <em>A part of yours, when Spirit guides it.</em>",
+      // Three paragraphs. Folded behind a real disclosure button so the page
+      // reads light (Nicholas, 2026-08-10). Nothing is truncated or reworded;
+      // the whole thing is one tap away, and open + static under reduced motion.
+      collapsible: true,
+      blurb: "Mindset coaching is naturally woven into my sessions whenever Spirit guides me to, and when I feel it's needed to support your journey. Sometimes the messages you receive are not only about gaining clarity, but also about creating lasting change by recognising limiting beliefs, shifting old patterns, and seeing things from a new perspective.\n\nAt times, I may give you simple exercises, reflections, or practical tasks to complete between sessions. These are designed to help you strengthen your mindset, work through the challenges you're experiencing, and gently move forward with greater confidence, self-awareness, and empowerment.\n\nYou'll walk away with practical tools, a fresh perspective, and the confidence to create positive, lasting change in your life."
+    },
+    {
+      // ⭐ KARINE'S REVISED SAGE COPY, verbatim (2026-08-10). This SUPERSEDES
+      // the "Sage Clearing" text applied on 2026-08-05 — she retitled it
+      // "Guided Sage Cleansing" and rewrote the body.
+      // The eyebrow and the emotional foil line are OURS, not hers — confirm.
+      // Both were rewritten too: the old ones implied sage happens before
+      // every session, which her new copy explicitly says it does not.
+      id: "sage",
+      eyebrow: "When Spirit guides it",
+      title: "Guided Sage Cleansing",
+      emotional: "Never in every session. <em>Only when it will carry you.</em>",
+      // One short paragraph, so it stays open. Her REAL sage clip rides
+      // alongside it instead of a still (it replaced assets/space/05-crystals.jpg,
+      // which showed the same bowl on the same altar).
+      // 540x784, 7.17s, 24fps, silent, 596KB. The ping-pong loop is baked into
+      // the file — the player only ever sets loop = true, so do NOT re-encode it.
+      // ⚠️ Honest phone footage with real weaknesses (magenta runner, thin smoke,
+      // domestic background). It was judged shippable ONLY as a small, quiet
+      // supporting tile: keep it ~280px wide, never full-bleed, never a section
+      // background. Reduced motion renders the poster as a still.
+      video: "assets/sage/sage.mp4",
+      poster: "assets/sage/sage-poster.jpg",
+      videoAlt: "Sage smouldering in a bowl of crystals beside a rose quartz sphere on Karine's altar",
+      blurb: "At times, I may be guided by Spirit to use sage during your reading or Reiki session. Sage has long been used as a gentle cleansing tool to help clear heavy or stagnant energy, creating a calm and peaceful space for healing, clarity, and connection. It is never used in every session, only when I intuitively feel it will support your journey."
+    }
+  ],
 
   reikiSupports: {
     eyebrow: "Reiki may help to",
@@ -126,11 +175,15 @@ export const content = Object.freeze({
   journey: {
     eyebrow: "The session journey",
     emotional: "From the first message to the last breath, <em>you are held.</em>",
+    // ⭐ KARINE'S OWN "HOW IT WORKS" COPY, verbatim (2026-08-05). Do not reword.
+    // She added a 5th step (Pre-Appointment) covering the full name + fresh selfie.
+    // Her lowercase "spirit" here is hers as written — check before capitalising.
     steps: [
-      { step: "01", title: "Reach out",   body: "Send a text with the session you feel drawn to. I will reply with times and answer anything you are unsure about." },
-      { step: "02", title: "We tune in",  body: "Before we begin I ground and connect, so the space is calm, protected and ready to receive whatever Spirit brings." },
-      { step: "03", title: "Your session", body: "In person in Gilston or online, we move gently, at your pace, guided by intuition and divine guidance." },
-      { step: "04", title: "Integration", body: "You leave with clarity, grounding practices and space to let the energy settle. Follow-up guidance is always welcome." }
+      { step: "01", title: "Reach Out",       body: "Send me a message with the session you feel most drawn to. I'll get back to you with my available appointment times and happily answer any questions you may have before booking." },
+      { step: "02", title: "Pre-Appointment", body: "Once we've confirmed your booking, I'll ask you to send me your full name and a fresh selfie photo of yourself so I can tune into your energy and sense what spirit may wish to reveal before your session." },
+      { step: "03", title: "We Tune In",      body: "Before we begin, I take a moment to ground myself and connect. This creates a calm, protected space that is open and ready to receive whatever spirit wishes to bring through." },
+      { step: "04", title: "Your Session",    body: "In person in Gilston or online, we move gently and at your pace, guided by intuition and divine guidance." },
+      { step: "05", title: "Integration",     body: "You leave with clarity, grounding practices, and space to let everything settle. Follow-up guidance is always welcome." }
     ],
     modes: [
       { id: "inperson", glyph: "home",  title: "In person, Gilston", body: "A quiet, sacred room in the Gold Coast Hinterland. Readings, Reiki and coaching. Reiki healing is in person only." },
@@ -150,7 +203,11 @@ export const content = Object.freeze({
     // per item later to switch that item to card checkout.
     products: [
       { id: "amethyst",         name: "Amethyst",         price: 30, material: "Natural amethyst, copper coil", image: "assets/pendulums/amethyst.jpg",        alt: "Amethyst crystal-point pendulum with a copper coil", blurb: "Calming and intuitive. A gentle companion for meditation, dowsing and turning inward." },
-      { id: "rose-quartz",      name: "Rose Quartz",      price: 30, material: "Rose quartz",                   image: "assets/pendulums/rose-quartz.jpg",     alt: "Rose quartz crystal-point pendulum", blurb: "The stone of the heart. Soft, loving energy for compassion and self-worth." },
+      // ⚠️ Was listed as "Rose Quartz" until 2026-08-05. The photo is a warm
+      // golden-peach cone, not pink — identified as yellow aventurine. The
+      // NAME is corrected; this BLURB is ours, not Karine's, so she should
+      // confirm both the stone and the wording before launch.
+      { id: "yellow-aventurine", name: "Yellow Aventurine", price: 30, material: "Yellow aventurine",           image: "assets/pendulums/yellow-aventurine.jpg", alt: "Yellow aventurine crystal-point pendulum", blurb: "Steadying and confident. For self-belief, clear decisions and standing in your own quiet power." },
       { id: "citrine",          name: "Citrine",          price: 30, material: "Golden citrine, copper coil",   image: "assets/pendulums/citrine.jpg",         alt: "Golden citrine crystal-point pendulum", blurb: "Warm and uplifting. Carries light, optimism and a sense of abundance." },
       { id: "tiger-eye",        name: "Tiger's Eye",      price: 30, material: "Tiger's eye, copper coil",      image: "assets/pendulums/tiger-eye.jpg",       alt: "Tiger's eye crystal-point pendulum", blurb: "Grounding and protective. For courage, focus and steady confidence." },
       { id: "red-jasper",       name: "Red Jasper",       price: 30, material: "Red jasper, copper coil",       image: "assets/pendulums/red-jasper.jpg",      alt: "Red jasper crystal-point pendulum", blurb: "Earthy and stabilising. A grounding stone for strength and quiet endurance." },
@@ -168,18 +225,108 @@ export const content = Object.freeze({
     eyebrow: "The space",
     emotional: "A room that holds you. <em>Step in and exhale.</em>",
     note: "A glimpse of the sacred space where in-person sessions are held, in the Gold Coast Hinterland.",
+    // ⭐ 2026-08-10 — the photos were DELIBERATELY thinned here, not lost.
+    // Four of the seven now live further up the page (readings card, Reiki card,
+    // the sage panel and the psychic-parties panel) so the writing is broken up
+    // by her real imagery instead of arriving as one block of tiles at the end.
+    // The tiles below render UNCROPPED (masonry columns, natural height) — the
+    // old fixed 240px row plus object-fit:cover was cutting her portrait shots
+    // in half on a laptop.
+    // ⏭️ Her new expo photos drop straight in here as more items.
     items: [
       { src: "assets/space/01-table.jpg",        alt: "Karine's reading table with crystal spheres, tarot cards and tumbled stones", category: "space" },
-      { src: "assets/space/02-tarot-spread.jpg", alt: "A tarot spread laid out on velvet, the Ten of Cups at the centre",             category: "tools" },
-      { src: "assets/space/04-reiki-table.jpg",  alt: "The Reiki healing table set with a line of chakra stones",                     category: "space" },
       { src: "assets/space/06-crystal-ball.jpg", alt: "Clear quartz sphere, sage and crystals on the altar",                          category: "tools" },
-      { src: "assets/space/03-tarot-cards.jpg",  alt: "The Lovers, Nine of Pentacles and The High Priestess drawn from the deck",     category: "tools" },
       { src: "assets/space/07-room.jpg",         alt: "Karine's sacred reading room in Gilston",                                      category: "space" }
     ],
     categories: [
       { id: "space", label: "The room" },
       { id: "tools", label: "Sacred tools" }
     ]
+  },
+
+  // ⭐ GATHERINGS — the two ways to meet Karine outside a private one-to-one
+  // session: her Psychic Parties and the psychic expos she reads at.
+  // Both are NEW on 2026-08-10 at her request ("it is not mentioned anywhere
+  // and needs to be"). Neither is priced or separately bookable yet, so both
+  // resolve to an enquiry text, exactly like the pendulum shop does.
+  // The section hides itself if `items` is ever emptied (honest empty state).
+  // The eyebrow, the emotional foil line, the "Psychic Expos" panel title and
+  // the CTA wording are OURS, not hers — confirm with her.
+  gatherings: {
+    eyebrow: "Groups & gatherings",
+    emotional: "Gather your people. <em>Let the guidance find them too.</em>",
+    items: [
+      {
+        id: "parties",
+        // ⭐ KARINE'S OWN PSYCHIC PARTIES COPY, verbatim (2026-08-10). Do not reword.
+        eyebrow: "For your next gathering",
+        title: "Psychic Parties",
+        // Five paragraphs — by far the longest single run of copy on the page,
+        // so it is folded behind a disclosure button (Nicholas, 2026-08-10).
+        // Verbatim and complete inside; open + static under reduced motion.
+        collapsible: true,
+        image: "assets/space/03-tarot-cards.jpg",
+        imageAlt: "The Lovers, Nine of Pentacles and The High Priestess drawn from the deck",
+        blurb: "Looking for something a little different for your next gathering? My Psychic Parties are a beautiful, fun, and meaningful way to bring people together, whether you're celebrating a birthday, hens party, girls' night, family gathering, or simply wanting to share a unique experience with friends.\n\nEvery party is tailored to suit your group and what feels right for the occasion. I can offer mini intuitive psychic and mediumship readings, tarot and pendulum guidance, interactive group activities, and fun spiritual games that encourage connection, laughter, and meaningful conversations.\n\nIf your group is curious, I can also introduce everyone to the pendulum, teaching the basics of how to use it and allowing guests to experience it for themselves in a relaxed and supportive way.\n\nWhether your group is looking for heartfelt guidance, light-hearted fun, or a blend of both, I create a warm, welcoming space where everyone feels included. Every gathering is unique, and I work with you beforehand to ensure the experience reflects your group's needs, energy, and vision.\n\nMy goal is for every guest to leave feeling uplifted, connected, and with something meaningful to take away from the experience. ✨"
+      },
+      {
+        id: "expos",
+        // ⭐ KARINE'S OWN EXPO COPY, verbatim (2026-08-10). The panel title is ours.
+        eyebrow: "Come and say hello",
+        title: "Psychic Expos",
+        blurb: "Throughout the year, you can also find me at a selection of local psychic expos. They're a wonderful opportunity to meet in person, experience a mini reading, ask questions, and see if my work resonates with you."
+      }
+    ],
+    // No prices or mechanics have been set for either, so this is an enquiry,
+    // never a booking. Do not add a price here without her confirming one.
+    cta: { label: "Ask about a psychic party", intro: "I'd love to ask you about a psychic party." }
+  },
+
+  // ⭐ GIFT VOUCHERS — new on 2026-08-10. Karine: "a section where they can
+  // order a gift voucher". Nicholas: "match the sessions and also a custom
+  // amount also show an example of it".
+  //
+  // ⚠️ HONESTY RULES BAKED IN:
+  //  • Every denomination below is one of HER real, confirmed session prices
+  //    (30-min reading $90 · 60-min reading $150 · Reiki 60-min $110). No price
+  //    has been invented, and there is no "value" or "was/now" framing.
+  //  • There is NO payment processing on this site, so ordering is a pre-filled
+  //    SMS, exactly like the pendulum shop. Nothing is ever charged here and
+  //    there is no fake success state.
+  //  • The preview card is a DESIGN MOCK of what she sends, drawn from the
+  //    design tokens. It carries no serial number, no expiry and no terms,
+  //    because none have been agreed with her.
+  // ⏭️ CONFIRM with Karine: voucher expiry/validity, and whether she wants a
+  //    printable PDF or just a message she forwards.
+  vouchers: {
+    eyebrow: "Gift vouchers",
+    emotional: "Give someone the answer they have been carrying. <em>A session, when they are ready for it.</em>",
+    note: "A gift voucher can be put toward any session with me. Choose the session you'd like to gift, or any amount you like, and text me. I'll confirm the details and send the voucher through to you.",
+    // Real session prices only.
+    options: [
+      { id: "reading-30", label: "30-minute reading",       amount: 90,  detail: "Intuitive psychic mediumship reading" },
+      { id: "reading-60", label: "60-minute reading",       amount: 150, detail: "Intuitive psychic mediumship reading" },
+      { id: "reiki-60",   label: "60-minute Reiki healing", amount: 110, detail: "Intuitive Reiki healing, in person in Gilston" }
+    ],
+    custom: {
+      id: "custom",
+      label: "Another amount",
+      detail: "To put toward any session",
+      placeholder: "Amount in AUD",
+      hint: "Any amount you like. It goes toward whichever session they choose."
+    },
+    // Wording that appears ON the example voucher card.
+    preview: {
+      kicker: "Gift voucher",
+      forLabel: "For",
+      forPlaceholder: "Their name",
+      fromLabel: "From",
+      fromPlaceholder: "Your name",
+      foot: "Redeemable on any session with Karine S. Matthews · Gilston, or online worldwide"
+    },
+    cta: { label: "Order this voucher by text" },
+    // Shown under the CTA so nobody expects to pay on the page.
+    paymentNote: "There is no checkout here. Text me what you'd like and I'll confirm the details and send you my PayID or bank transfer details, the same as a session booking."
   },
 
   testimonials: {
@@ -193,10 +340,45 @@ export const content = Object.freeze({
       { metric: "In person + online", label: "worldwide",      sub: "Sit with Karine in Gilston, or connect from anywhere." },
       { metric: "Reiki attuned",      label: "energy healing", sub: "Gentle, grounding, and always held with compassion." }
     ],
-    // Real client reflections (shared by Karine). Names kept anonymous for privacy;
-    // add first names with permission, and pull in more from her Facebook page.
+    // ⭐ HER REAL FACEBOOK REVIEWS (2026-08-10), verbatim from her page
+    // "Reconnect with Karine S Matthews". The review TEXT is untouched, and no
+    // date, rating or star count has been added — she supplied none we can
+    // verify on the page itself, so none is claimed.
+    //
+    // ⚠️ ATTRIBUTION RULE (Nicholas's call, 2026-08-10): these reviewers are
+    // real people who wrote on a Facebook page, not on this website. They are
+    // published as FIRST NAME + LAST INITIAL only ("Olivia Sutton" → "Olivia S.")
+    // so the quote stays honest and attributable without republishing anyone's
+    // full name off-platform. Do NOT restore the full surnames.
+    // The full names are in `_incoming/BRIEF-2026-08-10.md` if she ever gives
+    // explicit per-person permission to use them.
+    //
+    // ✅ POLICY CONFIRMED (Karine via Nicholas, 2026-08-10). Her `sub` intro says
+    // testimonials are kept anonymous, and that is CORRECT AS WRITTEN — her actual
+    // policy is "anonymous unless they chose to publish a review themselves". Her
+    // copy is not to be changed. What makes the policy legible on the page is the
+    // `source` field below:
+    //   • `source` set  → a publicly posted review. Named, with a quiet source line.
+    //   • `source` absent → private feedback texted to her. Anonymous, no source line.
+    // Never put a `source` on an anonymous item, and never publish a named item
+    // without one. `service` stays what it has always been: the session type.
     items: [
-      { quote: "From the moment I arrived, I felt completely welcomed and comfortable. She really listened, never rushed, and went into so much detail. There were things she picked up that were incredibly accurate. The reading gave me clarity, reassurance and confidence in the direction I'm heading. I left feeling lighter, more grounded and with a renewed sense of purpose.", name: "A recent client", service: "Psychic & mediumship reading" },
+      { quote: "I've seen Karine twice and I highly recommend! Both readings were incredibly insightful and accurate - she will tell you what you need to hear! Book a reading asap!!", name: "Olivia S.", source: "Publicly shared on her Facebook page" },
+      { quote: "Thank you Karine for the two amazing readings I have had from you (the last one luckily enough to be in person!)\n\nI have had many readings over the years from different people and I found Karine to be warm and welcoming and very intuitive she was totally spot on with her information and has an incredible and unique gift, I highly recommend a session with her and I will definitely be back ! Thank you so much lovely ❤️", name: "Sally G.", source: "Publicly shared on her Facebook page" },
+      { quote: "Absolutely beautiful reading. It resonated deeply with my own experiences and the connections I have with my loved ones.\n\nKarine provides warmth, compassion and respect. She creates a safe place when seeking spiritual guidance.\n\nThank you for such a caring and heartfelt experience. I highly recommend this to anyone seeking an authentic and uplifting reading. 💗💗", name: "Shontelle A.", source: "Publicly shared on her Facebook page" },
+      { quote: "Karine was so accurate and gave me so much clarity with my reading. She is such a lovely soul and has an amazing gift. I can't recommend enough ✨", name: "Sharna S.", source: "Publicly shared on her Facebook page" },
+      { quote: "I recently had a reading with Karine and was genuinely impressed by her intuitive abilities. She has a warm, compassionate nature and made me feel comfortable from the very beginning. The insights she shared were incredibly accurate, thoughtful, and delivered with care. Karine has a remarkable gift as a psychic medium, providing guidance and connections that felt meaningful and authentic. Her reading offered clarity, reassurance, and several validations that resonated deeply with me.\nI highly recommend Karine to anyone seeking spiritual guidance, insight, or a connection with loved ones in spirit. Thank you, Karine, for such a positive and uplifting experience. 💜✨", name: "Kel S.", source: "Publicly shared on her Facebook page" },
+      { quote: "Karine has a beautiful, calming energy that made me feel so at ease during my reading. She was spot on with so many things that came through during the session. Infact, she spoke about my questions before I even had to speak them out loud. I walked away feeling very positive, seen and cared for. I would recommend Karine to anyone looking for some guidance", name: "Karen P.", source: "Publicly shared on her Facebook page" },
+      // ⚠️ HELD BACK, ON PURPOSE. This is the full verbatim Facebook review whose
+      // reviewer's name was cut off in Karine's screenshot. renderVoices() skips
+      // any item whose `name` contains "CONFIRM", so it is NOT published: we will
+      // not invent a name for her, and we will not quietly file a named public
+      // review under "A recent client" as if it were anonymous.
+      // It replaces the shortened, anonymised paraphrase of this same review that
+      // sat here until 2026-08-10 — her own wording supersedes ours.
+      // ⏭️ Get the name from her, drop it in, delete this comment.
+      { quote: "I had such a beautiful experience and would highly recommend a reading.\n\nFrom the moment I arrived, I felt completely welcomed and comfortable. She took the time to really listen, never made me feel rushed, and went into so much detail throughout the reading.\n\nThere were several things she picked up that were incredibly accurate, including aspects of my health and where I'm currently at in my life, which genuinely surprised me. More than anything, the reading gave me clarity, reassurance, and confidence in the direction I'm heading.\n\nI left feeling lighter, more grounded, and with a renewed sense of purpose. Whether you're looking for guidance, reassurance, or are simply curious, I would absolutely recommend booking a reading. My partner also had a reading and it was his first one, he left with a very open mind and had a lot more clarity. Thank you again for such a thoughtful and meaningful experience. 💗", name: "CONFIRM — name not captured in the screenshot", source: "Publicly shared on her Facebook page" },
+      // Reflections she shared privately, kept anonymous at her request.
       { quote: "Thank you so much for today. I was in shock and speechless, just content in knowing that my loved ones came through and that they are around me. It gave me so much more clarity. You are amazing at what you do!", name: "A recent client", service: "Mediumship reading", featured: true },
       { quote: "Thank you so much for such a good reading. You have helped me feel more grounded and have a bit more clarity.", name: "A recent client", service: "Psychic reading" },
       { quote: "I just wanted to say thank you again for your guidance and kindness. I really needed that. You have such an amazing gift.", name: "A recent client", service: "Reading" }
@@ -237,10 +419,15 @@ export const content = Object.freeze({
     ]
   },
 
-  socials: [   // CONFIRM real URLs / handles
-    { id: "instagram", label: "Instagram", handle: "@karine",            url: "https://instagram.com/CONFIRM" },
-    { id: "facebook",  label: "Facebook",  handle: "Karine S. Matthews", url: "https://facebook.com/CONFIRM" },
-    { id: "tiktok",    label: "TikTok",    handle: "@karine",            url: "https://tiktok.com/@CONFIRM" }
+  // ⭐ HER REAL SOCIALS (2026-08-06), each one resolved and confirmed hers.
+  // Instagram and TikTok are both the handle @karinesmatthews, matching the
+  // domain. Facebook is the page "Reconnect with Karine S Matthews" (4.2K
+  // followers) — she has NO vanity URL, so this is the stable numeric-ID form
+  // that her /share/ link redirects to. Swap it only if she creates a vanity.
+  socials: [
+    { id: "instagram", label: "Instagram", handle: "@karinesmatthews",    url: "https://www.instagram.com/karinesmatthews" },
+    { id: "facebook",  label: "Facebook",  handle: "Reconnect with Karine S Matthews", url: "https://www.facebook.com/profile.php?id=61558266392714" },
+    { id: "tiktok",    label: "TikTok",    handle: "@karinesmatthews",    url: "https://www.tiktok.com/@karinesmatthews" }
   ],
 
   faq: [
@@ -288,7 +475,8 @@ export const content = Object.freeze({
     smsHref: "sms:+61404098706",                     // CONFIRM — all booking CTAs resolve here + a pre-filled ?&body=
     phone: "0404 098 706",
     phoneHref: "tel:+61404098706",
-    email: "hello@karinematthews.com.au",            // CONFIRM — desktop / shop fallback
+    // ⭐ No email fallback. Karine asked for the email sections to be removed
+    // (2026-08-10) and the site is fully bookable by SMS or phone without one.
     responseTimeLabel: "I reply personally, usually within a day.",
 
     // Karine asked (2026-08-04) that prices read like "$90 AUD".
@@ -298,8 +486,22 @@ export const content = Object.freeze({
 
     // ⭐ Karine's booking requirements, from her review on 2026-08-04.
     // These are her instructions - do not simplify them away.
-    days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-    dayParts: ["Morning", "Afternoon", "Evening"],
+    // ⭐ HER REAL TRADING HOURS, from her Facebook page (2026-08-05).
+    // Mon 09:30-16:30 · Tue 09:30-17:00 · Wed CLOSED · Thu 09:30-17:00
+    // Fri 09:30-17:00 · Sat 13:30-16:00 · Sun 13:30-16:00
+    // Nothing runs past 17:00, so there is NO evening column, and Wednesday is
+    // omitted entirely. Weekends are afternoon-only. Never offer a slot she
+    // does not actually work — she would only have to write back and decline.
+    dayParts: ["Morning", "Afternoon"],
+    days: [
+      { name: "Monday",    parts: ["Morning", "Afternoon"] },
+      { name: "Tuesday",   parts: ["Morning", "Afternoon"] },
+      { name: "Thursday",  parts: ["Morning", "Afternoon"] },
+      { name: "Friday",    parts: ["Morning", "Afternoon"] },
+      { name: "Saturday",  parts: ["Afternoon"] },
+      { name: "Sunday",    parts: ["Afternoon"] }
+    ],
+    hoursNote: "These are the times I read. Wednesdays I am closed, and weekends are afternoons only.",
     platforms: ["FaceTime", "WhatsApp", "Zoom"],     // shown only when Online is chosen
     focusPlaceholder: "For example, any particular area of your life you would like me to look at: personal, relationships, work or career.",
     // The SMS app lets you attach a photo before sending, so this is a real
@@ -324,8 +526,8 @@ export const content = Object.freeze({
     image: "https://karinematthews.com.au/assets/og/og-image.jpg",   // CONFIRM domain
     url: "https://karinematthews.com.au/",                           // CONFIRM domain
     telephone: "+61404098706",                                       // CONFIRM
-    email: "hello@karinematthews.com.au",                            // CONFIRM
-    address: {                                                       // locality only — honest for a home practice
+    // No `email` node — she asked for email to be removed (2026-08-10).
+    address: {                                                     // locality only — honest for a home practice
       "@type": "PostalAddress",
       addressLocality: "Gilston",
       addressRegion: "QLD",

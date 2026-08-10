@@ -72,6 +72,170 @@ function paras(text, cls) {
   return String(text || '').split(/\n{2,}/).map(t => `<p class="${cls}">${t.trim()}</p>`).join('');
 }
 
+// ============================================================
+// DISCLOSURE (accordion) — Nicholas, 2026-08-10: "make them a drop-down so
+// that there's not as much writing at once."
+//
+// Rules this obeys:
+//  • real <button> with aria-expanded + aria-controls, so it is keyboard
+//    operable and announced correctly. No div-with-onclick.
+//  • height is animated with a plain CSS transition, not JS per-frame work,
+//    so it never adds a second raf and never fights Lenis.
+//  • under reduced motion it returns the content RAW — no button, no panel,
+//    everything visible and static (hard rule 6). That is why REDUCED is
+//    checked here and not only in CSS.
+//  • the price, duration and Book CTA are never inside a panel. They are the
+//    conversion path and stay visible whether it is open or shut.
+// ============================================================
+let discloseSeq = 0;
+function disclosure(label, innerHtml, cls) {
+  if (!innerHtml) return '';
+  if (REDUCED) return `<div class="${cls || ''} disclose-static">${innerHtml}</div>`;
+  const id = `disclose-${++discloseSeq}`;
+  return `
+    <div class="disclose ${cls || ''}">
+      <button type="button" class="disclose-toggle" aria-expanded="false" aria-controls="${id}">
+        <span class="disclose-label">${label}</span>
+        <span class="disclose-chev" aria-hidden="true"></span>
+      </button>
+      <div class="disclose-panel" id="${id}">
+        <div class="disclose-inner">${innerHtml}</div>
+      </div>
+    </div>`;
+}
+
+function initDisclosures() {
+  if (REDUCED) return;
+  const panels = $$('.disclose-panel');
+  if (!panels.length) return;
+
+  // Once a panel finishes opening, drop the fixed height so it can reflow with
+  // the text (font swap, resize). Then let ScrollTrigger re-measure the page.
+  panels.forEach(panel => {
+    panel.addEventListener('transitionend', e => {
+      if (e.propertyName !== 'height') return;
+      if (panel.classList.contains('is-open')) panel.style.height = 'auto';
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
+    });
+  });
+
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.disclose-toggle');
+    if (!btn) return;
+    const panel = document.getElementById(btn.getAttribute('aria-controls'));
+    if (!panel) return;
+    const isOpen = btn.getAttribute('aria-expanded') === 'true';
+    if (isOpen) {
+      panel.style.height = panel.scrollHeight + 'px';
+      void panel.offsetHeight;                 // flush the layout, no rAF needed
+      panel.classList.remove('is-open');
+      panel.style.height = '0px';
+      btn.setAttribute('aria-expanded', 'false');
+    } else {
+      panel.classList.add('is-open');
+      panel.style.height = panel.scrollHeight + 'px';
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  });
+}
+
+// ============================================================
+// HORIZONTAL RAIL — the pendulum shop (2026-08-10)
+//
+// Nicholas: "all those pendulums I want that to be a horizontal scroll so that
+// if they want to buy the pendulum they can control horizontally and look at
+// all of them, if they don't want to they can just keep scrolling down past
+// them."
+//
+// This is deliberately NOT the pinned + scrubbed track that #journey uses.
+// A pin converts vertical scroll into horizontal travel and traps the visitor
+// until the track finishes — the exact opposite of what was asked for. Here the
+// browser does the scrolling natively and the page scrolls past untouched.
+//
+// Rules this obeys:
+//  • no requestAnimationFrame and no GSAP ticker of its own — the scroll
+//    listener is passive and does nothing but toggle two classes (mobile gate).
+//  • the buttons are aria-disabled at the ends, never `disabled`, so reaching
+//    the end of the rail cannot orphan keyboard focus.
+//  • the track is focusable and arrow-key scrollable; tabbing onto a card's
+//    Order-by-text button scrolls it into view natively, so nothing is stranded.
+//  • under reduced motion the scroll jumps instead of gliding (see also the CSS,
+//    which drops scroll-snap so there is no animated snap-back).
+// ============================================================
+function initRails() {
+  $$('.rail').forEach(rail => {
+    const track = rail.querySelector('.rail-track');
+    if (!track) return;
+    const prev = rail.querySelector('[data-rail-prev]');
+    const next = rail.querySelector('[data-rail-next]');
+
+    // One card plus one gap, so a click always lands on a snap point.
+    const step = () => {
+      const first = track.firstElementChild;
+      if (!first) return Math.round(track.clientWidth * 0.8);
+      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+      return Math.round(first.getBoundingClientRect().width + gap);
+    };
+
+    const sync = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      const atStart = track.scrollLeft <= 1;
+      const atEnd = max <= 1 || track.scrollLeft >= max - 1;
+      track.classList.toggle('at-start', atStart);
+      track.classList.toggle('at-end', atEnd);
+      if (prev) prev.setAttribute('aria-disabled', String(atStart));
+      if (next) next.setAttribute('aria-disabled', String(atEnd));
+    };
+
+    const nudge = dir => track.scrollBy({ left: dir * step(), behavior: REDUCED ? 'auto' : 'smooth' });
+    const wire = (btn, dir) => {
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        if (btn.getAttribute('aria-disabled') === 'true') return;
+        nudge(dir);
+      });
+    };
+    wire(prev, -1);
+    wire(next, 1);
+
+    // Left/right move the rail. Up/down are left alone on purpose so vertical
+    // page scroll always passes straight through, focus or no focus.
+    track.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight')     { e.preventDefault(); nudge(1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); nudge(-1); }
+    });
+
+    track.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync, { passive: true });
+    sync();
+  });
+}
+
+// ============================================================
+// INCLUSION VIDEOS — same contract as the hero video.
+// The poster paints first, the <video> is only ever created when motion is
+// allowed (reduced motion gets the still and no video element at all), and the
+// autoplay flags are set as BOTH properties and attributes because iOS Safari
+// reads the attributes. The loop is a ping-pong baked into the file, so all the
+// player ever does is loop = true.
+// ============================================================
+function initInclusionVideos() {
+  $$('[data-inclusion-video]').forEach(mount => {
+    const src = mount.dataset.inclusionVideo;
+    if (!src) return;
+    const v = document.createElement('video');
+    v.className = 'inclusion-video';
+    v.muted = true; v.defaultMuted = true; v.loop = true; v.autoplay = true; v.playsInline = true;
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('autoplay', '');
+    v.setAttribute('loop', ''); v.setAttribute('preload', 'auto');
+    if (mount.dataset.poster) v.poster = mount.dataset.poster;
+    if (mount.dataset.label) { v.setAttribute('role', 'img'); v.setAttribute('aria-label', mount.dataset.label); }
+    v.src = src;
+    mount.appendChild(v);
+    const p = v.play(); if (p && typeof p.catch === 'function') p.catch(() => {});
+  });
+}
+
 // Small inline SVG glyph set (stroke icons).
 const GLYPHS = {
   home:   `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15 16 6l11 9"/><path d="M8 13v12h16V13"/><path d="M13 25v-6h6v6"/></svg>`,
@@ -137,7 +301,9 @@ function renderIntro() {
   const q = $('#welcomeQuestions');
   if (q) { q.classList.add('stagger'); q.innerHTML = (i.questions || []).map(t => `<li>${t}</li>`).join(''); }
   $('#welcomeEmotional').innerHTML = i.emotional;
-  $('#welcomeBody').textContent = i.body;
+  // Her closing copy is two paragraphs (2026-08-10), so it goes through paras().
+  // #welcomeBody is a <div> for exactly this reason — <p> inside <p> is invalid.
+  $('#welcomeBody').innerHTML = paras(i.body, 'welcome-body-p');
 }
 
 // ---- EARLY PROOF: one featured, real reflection placed high (hide if none) ----
@@ -159,13 +325,24 @@ function renderServices() {
       : `<div class="svc-options">${s.options.map(o =>
           `<span class="svc-opt"><span class="svc-opt-label">${o.label}</span><span class="svc-opt-price">${priceAUD(o.price)}</span></span>`
         ).join('')}</div>`;
+    // Her real photo heads the card so the sessions section is not a wall of
+    // type. Eager: these two are above the fold on a laptop.
+    const media = s.image ? `
+      <div class="svc-media">
+        <img src="${s.image}" alt="${s.imageAlt || ''}" loading="lazy" decoding="async"
+             onerror="this.parentElement.remove()">
+      </div>` : '';
+    // Her full description lives behind the toggle. Price + duration + Book
+    // stay outside it, always visible — they are the conversion path.
+    const detail = disclosure('About this session', paras(s.blurb, 'svc-blurb'), 'svc-disclose');
     return `
     <article class="svc-card" data-reveal>
       <div class="svc-card-glow" aria-hidden="true"></div>
+      ${media}
       <h3 class="svc-name">${s.name}</h3>
       <p class="svc-modality">${s.modality}</p>
       ${s.tagline ? `<p class="svc-tagline">${s.tagline}</p>` : ''}
-      ${paras(s.blurb, "svc-blurb")}
+      ${detail}
       ${priceRow}
       <div class="svc-cta">
         <a href="#book" class="btn ${s.enquireOnly ? 'btn-ghost' : 'btn-primary'}" data-book="${s.id}">${s.cta.label} <span class="arrow">→</span></a>
@@ -176,16 +353,60 @@ function renderServices() {
 }
 
 // Mindset coaching is an INCLUSION, not a service. Hidden if she ever removes it.
-function renderMindsetCoaching() {
-  const c = content.mindsetCoaching;
-  const section = $('#mindsetCoaching');
-  if (!section) return;
-  if (!c) { section.hidden = true; return; }
-  section.hidden = false;
-  $('#mcEyebrow').textContent = c.eyebrow;
-  $('#mcTitle').textContent = c.title;
-  $('#mcEmotional').innerHTML = c.emotional;
-  $('#mcBody').innerHTML = paras(c.blurb, 'inclusion-p');
+// Inclusion panels (mindset coaching, sage clearing...). Same honest-empty-state
+// rule as #shop: no data, no section. Multi-paragraph blurbs go through paras()
+// so Karine's own paragraph breaks survive.
+function renderInclusions() {
+  const list = content.inclusions || [];
+  const mount = $('#inclusions');
+  if (!mount) return;
+  if (!list.length) { mount.hidden = true; mount.innerHTML = ''; return; }
+  mount.hidden = false;
+  mount.innerHTML = list.map(c => panelHtml(c)).join('');
+}
+
+// Shared panel markup for the inclusion-style blocks (mindset coaching, sage
+// cleansing, psychic parties, expos). An optional real photo sits beside the
+// copy, and a long blurb can be folded behind a disclosure button.
+function panelHtml(c) {
+  const body = paras(c.blurb, 'inclusion-p');
+  const copy = c.collapsible
+    ? disclosure(`Read about ${c.title}`, body, 'inclusion-disclose')
+    : `<div>${body}</div>`;
+  // The media block is OPTIONAL: a panel with neither `video` nor `image`
+  // (mindset coaching) renders as a plain single-column panel, untouched.
+  // A `video` panel is deliberately narrower than a photo panel — see the
+  // .inclusion.has-video rule. Reduced motion gets the poster as a still and
+  // no video element is ever created, exactly like the hero.
+  let media = '';
+  if (c.video) {
+    media = REDUCED
+      ? `<div class="inclusion-media inclusion-media--video">
+           <img src="${c.poster}" alt="${c.videoAlt || ''}" decoding="async"
+                onerror="this.parentElement.remove()">
+         </div>`
+      : `<div class="inclusion-media inclusion-media--video"
+              data-inclusion-video="${c.video}"
+              data-poster="${c.poster || ''}"
+              data-label="${c.videoAlt || ''}"></div>`;
+  } else if (c.image) {
+    media = `
+    <div class="inclusion-media">
+      <img src="${c.image}" alt="${c.imageAlt || ''}" loading="lazy" decoding="async"
+           onerror="this.parentElement.remove()">
+    </div>`;
+  }
+  const hasMedia = !!(c.video || c.image);
+  return `
+    <aside class="inclusion${hasMedia ? ' has-media' : ''}${c.video ? ' has-video' : ''}" data-reveal>
+      ${media}
+      <div class="inclusion-body">
+        ${c.eyebrow ? `<p class="eyebrow"><span class="dot"></span> ${c.eyebrow}</p>` : ''}
+        <h3 class="inclusion-title">${c.title}</h3>
+        ${c.emotional ? `<p class="inclusion-emotional">${c.emotional}</p>` : ''}
+        ${copy}
+      </div>
+    </aside>`;
 }
 
 function renderReikiSupports() {
@@ -257,8 +478,8 @@ function renderShop() {
   $('#shopGrid').innerHTML = s.products.map(p => {
     const href = productBuyHref(p);
     const isCart = !!p.checkoutUrl;
-    const emailPrice = p.price ? ' (' + priceAUD(p.price) + ')' : '';
-    const emailHref = `mailto:${content.booking.email}?subject=${encodeURIComponent('Pendulum order: ' + p.name)}&body=${encodeURIComponent("Hi Karine, I'd like to order the " + p.name + ' pendulum' + emailPrice + '.')}`;
+    // The "Prefer email?" fallback was removed 2026-08-10 at Karine's request.
+    // Orders are SMS-first; her phone number is on every card's button.
     return `
     <article class="pendulum-card" data-reveal>
       <div class="pendulum-media">
@@ -270,7 +491,6 @@ function renderShop() {
       ${p.blurb ? `<p class="pendulum-blurb">${p.blurb}</p>` : ''}
       ${p.price ? `<div class="pendulum-price" data-price="${p.id}">${currencyAU(p.price)} <small>AUD</small></div>` : `<div class="pendulum-price pendulum-price-enquire">Enquire to order</div>`}
       <a class="btn ${p.soldOut ? 'btn-ghost is-disabled' : 'btn-primary'}" href="${p.soldOut ? '#book' : href}"${isCart ? ' rel="nofollow"' : ''}${p.soldOut ? ' aria-disabled="true"' : ''}>${productBuyLabel(p)} <span class="arrow">→</span></a>
-      ${p.soldOut ? '' : `<a class="pendulum-email" href="${emailHref}">Prefer email?</a>`}
     </article>`;
   }).join('');
 }
@@ -290,15 +510,126 @@ function renderGallery() {
   $('#atmosphereTitle').classList.remove('split');
   $('#atmosphereTitle').classList.add('foil-line');
   $('#atmosphereNote').textContent = g.note;
-  $('#atmosphereGrid').innerHTML = g.items.map((it, i) => {
-    const cls = i % 5 === 2 ? 'wide' : (i % 7 === 4 ? 'tall' : '');
+  // No more `wide` / `tall` span classes: the grid is now a masonry column
+  // layout and every tile takes the photo's own height, so nothing is cropped.
+  // The old fixed 240px row + object-fit:cover was slicing her portrait shots
+  // roughly in half on a laptop (see the 2026-08-10 fix).
+  $('#atmosphereGrid').innerHTML = g.items.map(it => {
     const cat = (g.categories || []).find(c => c.id === it.category);
     return `
-      <figure class="atmosphere-tile ${cls}" data-reveal>
-        <img src="${it.src}" alt="${it.alt}" loading="lazy" onerror="this.parentElement.style.background='var(--surface-3)';this.remove()">
+      <figure class="atmosphere-tile" data-reveal>
+        <img src="${it.src}" alt="${it.alt}" loading="lazy" decoding="async" onerror="this.parentElement.remove()">
         ${cat ? `<figcaption class="tag">${cat.label}</figcaption>` : ''}
       </figure>`;
   }).join('');
+}
+
+// ---- GATHERINGS: psychic parties + psychic expos ----
+// The two ways to meet Karine outside a private one-to-one session. Neither is
+// priced or separately bookable, so the only action is an enquiry text.
+// Same honest-empty-state rule as #shop: no items, no section.
+function renderGatherings() {
+  const section = $('#gatherings');
+  if (!section) return;
+  const g = content.gatherings;
+  const items = (g && Array.isArray(g.items)) ? g.items : [];
+  if (!items.length) { section.hidden = true; return; }
+  section.hidden = false;
+  $('#gatheringsEyebrow').innerHTML = `<span class="dot"></span> ${g.eyebrow}`;
+  const title = $('#gatheringsTitle');
+  title.innerHTML = g.emotional;
+  title.dataset.split = 'skip';
+  title.classList.remove('split');
+  title.classList.add('foil-line');
+  $('#gatheringsPanels').innerHTML = items.map(it => panelHtml(it)).join('');
+  const cta = $('#gatheringsCta');
+  cta.innerHTML = (g.cta && g.cta.label)
+    ? `<a class="btn btn-primary" href="${bookingSms(g.cta.intro)}">${g.cta.label} <span class="arrow">→</span></a>`
+    : '';
+}
+
+// ---- GIFT VOUCHERS ----
+// Denominations are her REAL session prices, plus a free amount. There is no
+// payment processing on this site, so the only action is a pre-filled SMS,
+// exactly like the pendulum shop. Nothing is ever "purchased" here and there
+// is no fake success state. The card on the left is a live preview of the
+// voucher she sends, so "show an example of it" is answered literally.
+function renderVouchers() {
+  const section = $('#vouchers');
+  if (!section) return;
+  const v = content.vouchers;
+  const opts = (v && Array.isArray(v.options)) ? v.options : [];
+  if (!v || !opts.length) { section.hidden = true; return; }   // honest empty state
+  section.hidden = false;
+
+  $('#vouchersEyebrow').innerHTML = `<span class="dot"></span> ${v.eyebrow}`;
+  const title = $('#vouchersTitle');
+  title.innerHTML = v.emotional;
+  title.dataset.split = 'skip';
+  title.classList.remove('split');
+  title.classList.add('foil-line');
+  $('#vouchersNote').textContent = v.note;
+  $('#voucherKicker').textContent = v.preview.kicker;
+  $('#voucherFoot').textContent = v.preview.foot;
+  $('#voucherPaymentNote').textContent = v.paymentNote;
+  $('#voucherCaption').textContent = 'An example of the voucher Karine sends through.';
+  if (v.custom && v.custom.hint) $('#voucherCustomHint').textContent = v.custom.hint;
+
+  const all = opts.concat(v.custom ? [Object.assign({ isCustom: true, amount: null }, v.custom)] : []);
+  $('#voucherOptions').innerHTML = all.map((o, i) => `
+    <label class="bk-session${i === 0 ? ' is-selected' : ''}">
+      <input type="radio" name="voucher" value="${o.id}" data-custom="${!!o.isCustom}" ${i === 0 ? 'checked' : ''}>
+      <span class="bk-session-main">
+        <span class="bk-session-title">${o.label}</span>
+        <span class="bk-session-dur">${o.detail}</span>
+      </span>
+      <span class="bk-session-price">${o.amount ? priceAUD(o.amount) : 'You choose'}</span>
+    </label>`).join('');
+
+  const wrap = $('#voucherOptions');
+  const customField = $('#voucherCustomField');
+  const customInput = $('#voucherAmountInput');
+  const forInput = $('#voucherFor');
+  const fromInput = $('#voucherFrom');
+  const cta = $('#voucherCta');
+  const p = v.preview;
+
+  function chosen() {
+    const sel = wrap.querySelector('input[name="voucher"]:checked');
+    return all.find(o => o.id === (sel && sel.value)) || all[0];
+  }
+  // Digits only — a voucher amount is a whole number of dollars.
+  function customAmount() {
+    const n = parseInt(String(customInput.value).replace(/[^0-9]/g, ''), 10);
+    return Number.isFinite(n) && n > 0 ? n : null;
+  }
+
+  function update() {
+    const o = chosen();
+    const isCustom = !!o.isCustom;
+    $$('.bk-session', wrap).forEach(l => l.classList.toggle('is-selected', !!l.querySelector('input:checked')));
+    customField.hidden = !isCustom;
+    const amount = isCustom ? customAmount() : o.amount;
+
+    $('#voucherAmount').textContent = amount ? priceAUD(amount) : '$ —';
+    $('#voucherDetail').textContent = o.detail;
+    const to = forInput.value.trim();
+    const from = fromInput.value.trim();
+    $('#voucherLines').innerHTML = `
+      <span class="voucher-line"><span class="voucher-line-label">${p.forLabel}</span><span class="voucher-line-value${to ? '' : ' is-blank'}">${to || p.forPlaceholder}</span></span>
+      <span class="voucher-line"><span class="voucher-line-label">${p.fromLabel}</span><span class="voucher-line-value${from ? '' : ' is-blank'}">${from || p.fromPlaceholder}</span></span>`;
+
+    // The label never claims an amount the visitor has not chosen.
+    cta.innerHTML = `${v.cta.label}${amount ? ` · ${priceAUD(amount)}` : ''} <span class="arrow">→</span>`;
+    const bits = [`I'd like to order a gift voucher: ${o.label}${amount ? ` (${priceAUD(amount)})` : ''}.`];
+    if (to) bits.push(`It's for ${to}.`);
+    if (from) bits.push(`It's from ${from}.`);
+    cta.href = bookingSms(bits.join(' '));
+  }
+
+  wrap.addEventListener('change', update);
+  [customInput, forInput, fromInput].forEach(el => el.addEventListener('input', update));
+  update();
 }
 
 function renderVoices() {
@@ -307,16 +638,31 @@ function renderVoices() {
   if (t.subhead) $("#voicesSubhead").textContent = t.subhead;
   $("#voicesSub").innerHTML = paras(t.sub, "voices-sub-p");
   // The featured quote is surfaced up top (early proof) — exclude it here so it never repeats.
-  const gridItems = (Array.isArray(t.items) ? t.items : []).filter(q => !q.featured);
+  // A quote whose `name` is still a CONFIRM placeholder is held back entirely
+  // (same rule renderSchema() uses for CONFIRM URLs). We will not invent an
+  // attribution, and we will not pass a named public review off as anonymous.
+  const gridItems = (Array.isArray(t.items) ? t.items : [])
+    .filter(q => !q.featured)
+    .filter(q => q.name && !/CONFIRM/.test(q.name));
   const hasReal = gridItems.length > 0;
   if (hasReal) {
+    // Her reviewers write in paragraphs too, so quotes go through paras().
+    // The container is a <div> because paras() emits <p> (no <p> inside <p>).
+    //
+    // ATTRIBUTION (2026-08-10): these quotes are a MIX and the difference is
+    // shown, not hidden. An item with a `source` is a review the person chose to
+    // publish themselves on her Facebook page, so it carries a name AND a quiet
+    // source line. An item without one is private feedback texted to her, stays
+    // "A recent client" and gets NO source line. That is exactly the policy
+    // Karine describes in her own intro copy above the grid.
     $('#voicesGrid').innerHTML = gridItems.map(q => `
       <article class="voice-card" data-reveal>
         <span class="voice-quote-mark" aria-hidden="true">“</span>
-        <p class="voice-quote">${q.quote}</p>
+        <div class="voice-quote">${paras(q.quote, 'voice-quote-p')}</div>
         <div class="voice-meta">
           <span class="voice-name">${q.name}</span>
           ${q.service ? `<span class="voice-service">${q.service}</span>` : ''}
+          ${q.source ? `<span class="voice-source"><span class="voice-source-dot" aria-hidden="true"></span>${q.source}</span>` : ''}
         </div>
       </article>`).join('');
   } else {
@@ -398,15 +744,15 @@ function renderCta() {
 function renderContact() {
   const b = content.booking;
   const textHref = bookingSms("I'd like to book a session.");
+  // Two channels only. The Email channel was removed 2026-08-10 at Karine's
+  // request; the address it pointed at was a dead placeholder anyway.
   const channels = [
     { href: textHref, glyph: 'msg', label: 'Text Karine', value: b.phone },
-    { href: b.phoneHref, glyph: 'phone', label: 'Call direct', value: b.phone },
-    { href: `mailto:${b.email}`, glyph: 'mail', label: 'Email', value: b.email }
+    { href: b.phoneHref, glyph: 'phone', label: 'Call direct', value: b.phone }
   ];
   const chGlyph = {
     msg:   `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z"/></svg>`,
-    phone: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
-    mail:  `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>`
+    phone: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`
   };
   $('#contactChannels').innerHTML = channels.map(c => `
     <a class="channel" href="${c.href}">
@@ -426,7 +772,6 @@ function renderFooter() {
   $('#footerDirect').innerHTML = `
     <li><a href="${bookingSms("I'd like to book a session.")}">Text Karine</a></li>
     <li><a href="${content.booking.phoneHref}">${content.booking.phone}</a></li>
-    <li><a href="mailto:${content.booking.email}">${content.booking.email}</a></li>
   `;
   $('#footerSocials').innerHTML = content.socials.map(so =>
     `<li><a href="${so.url}" target="_blank" rel="noopener">${so.label}</a></li>`
@@ -442,6 +787,9 @@ function renderNav() {
   // Remove Shop links when the shop has no real products yet.
   const shopEmpty = !content.shop || !Array.isArray(content.shop.products) || content.shop.products.length === 0;
   if (shopEmpty) $$('[data-nav="shop"]').forEach(a => a.remove());
+  // Same rule for gift vouchers: no denominations, no section, no link to it.
+  const vouchersEmpty = !content.vouchers || !Array.isArray(content.vouchers.options) || content.vouchers.options.length === 0;
+  if (vouchersEmpty) $$('[data-nav="vouchers"]').forEach(a => (a.closest('li') || a).remove());
 }
 
 function renderSchema() {
@@ -491,10 +839,12 @@ renderIntro();
 renderEarlyProof();
 renderServices();
 renderReikiSupports();
-renderMindsetCoaching();
+renderInclusions();
 renderJourney();
 renderShop();
 renderGallery();
+renderGatherings();
+renderVouchers();
 renderVoices();
 renderAbout();
 renderSacred();
@@ -507,6 +857,9 @@ renderFooter();
 renderNav();
 renderSchema();
 applySplits();
+initDisclosures();
+initInclusionVideos();
+initRails();
 
 // ============================================================
 // PAGE-LOAD OVERTURE
@@ -715,10 +1068,13 @@ if (window.ScrollTrigger && !REDUCED) {
         scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 0.8 } });
   }
   // Atmosphere tile float — desktop only (one scrub per image is costly on touch).
+  // Moves the TILE, not the image inside it: the tiles now hug the photo's own
+  // height (nothing is cropped), so translating the <img> would have opened a
+  // sliver of empty tile at the top or bottom.
   if (!NO_HOVER) {
-    $$('.atmosphere-tile img').forEach(img => {
-      gsap.fromTo(img, { y: -8 }, { y: 8, ease: 'none',
-        scrollTrigger: { trigger: img, start: 'top bottom', end: 'bottom top', scrub: 1.5 } });
+    $$('.atmosphere-tile').forEach(tile => {
+      gsap.fromTo(tile, { y: -8 }, { y: 8, ease: 'none',
+        scrollTrigger: { trigger: tile, start: 'top bottom', end: 'bottom top', scrub: 1.5 } });
     });
   }
 }
@@ -892,17 +1248,26 @@ function renderBooking() {
 
   // Day × time-of-day grid. Karine asked for specific slots, not a free-text
   // "Saturday morning" - she wants to see exactly which days suit.
+  $('#bkWhen').style.setProperty('--bk-parts', (b.dayParts || []).length);
   $('#bkWhen').innerHTML = `
     <div class="bk-when-head"><span></span>${(b.dayParts || []).map(p => `<span>${p}</span>`).join('')}</div>
-    ${(b.days || []).map(d => `
+    ${(b.days || []).map(d => {
+      // A day is either a plain string (all parts) or { name, parts } when her
+      // real hours only cover some of them — weekends are afternoon-only.
+      const name = typeof d === 'string' ? d : d.name;
+      const open = typeof d === 'string' ? (b.dayParts || []) : (d.parts || []);
+      return `
       <div class="bk-when-row">
-        <span class="bk-when-day">${d}</span>
-        ${(b.dayParts || []).map(p => `
+        <span class="bk-when-day">${name}</span>
+        ${(b.dayParts || []).map(p => open.includes(p) ? `
           <label class="bk-slot">
-            <input type="checkbox" name="when" value="${d} ${p.toLowerCase()}" aria-label="${d} ${p.toLowerCase()}">
+            <input type="checkbox" name="when" value="${name} ${p.toLowerCase()}" aria-label="${name} ${p.toLowerCase()}">
             <span></span>
-          </label>`).join('')}
-      </div>`).join('')}`;
+          </label>` : `
+          <span class="bk-slot bk-slot--closed" aria-hidden="true"></span>`).join('')}
+      </div>`;
+    }).join('')}
+    ${b.hoursNote ? `<p class="bk-hours-note">${b.hoursNote}</p>` : ''}`;
 
   $('#bkFocus').placeholder = b.focusPlaceholder || '';
   $('#bkSelfie').textContent = b.selfieNote || '';
@@ -995,7 +1360,17 @@ function initScrollPendulum() {
   wrap.innerHTML = '<img class="swing-img" src="assets/hero/pendulum-cutout.webp" alt="" decoding="async">';
   host.appendChild(wrap);
 
-  const MAX = 15;               // degrees of travel either side
+  // Degrees of travel either side.
+  //
+  // ⚠️ THIS NUMBER IS GEOMETRICALLY TIED TO `.swing`'s `right` OFFSET IN CSS.
+  // The image is ~4.8 times taller than it is wide, so at angle θ its bottom
+  // tip sweeps sideways by height·sinθ. At the old 15° that was 139px of travel
+  // on a 112px-wide pendulum sitting only 72px from the edge of the band, and
+  // `.welcome { overflow: hidden }` sliced 65.6px off the crystal cone at the
+  // far end of every swing. CSS now reserves `--swing-w * 1.35` of clearance,
+  // which covers 15° on desktop. Phones cannot spare that much width, so the
+  // arc is tightened there instead. Change one, recheck the other.
+  const MAX = window.innerWidth <= 640 ? 8 : 15;
   let angle = 0, vel = 0, smoothed = 0, lastY = window.scrollY, visible = false;
 
   const io = new IntersectionObserver(es => { visible = es[0].isIntersecting; }, { rootMargin: '120px' });

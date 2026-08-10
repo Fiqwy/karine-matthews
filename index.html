@@ -79,6 +79,7 @@
     <a href="#services">Sessions</a>
     <a href="#reiki-supports">Reiki healing</a>
     <a href="#journey">How it works</a>
+    <a href="#vouchers" data-nav="vouchers">Gift vouchers</a>
     <a href="#shop" data-nav="shop">The pendulum shop</a>
     <a href="#about">About Karine</a>
     <a href="#sacred">Sacred content</a>
@@ -118,7 +119,8 @@
         <p class="eyebrow" id="welcomeEyebrow"><span class="dot"></span></p>
         <ul class="welcome-questions" id="welcomeQuestions" aria-label="You may be wondering"></ul>
         <p class="welcome-emotional foil-line" id="welcomeEmotional"></p>
-        <p class="welcome-body" id="welcomeBody"></p>
+        <!-- <div>, not <p>: her copy is multi-paragraph and goes through paras() -->
+        <div class="welcome-body" id="welcomeBody"></div>
       </div>
     </section>
     <div class="divider" data-reveal></div>
@@ -149,13 +151,9 @@
         </div>
         <div class="services-grid" id="servicesGrid"></div>
 
-        <!-- Mindset coaching: a bonus INCLUDED in a session, not a service she sells -->
-        <aside class="inclusion" id="mindsetCoaching" data-reveal hidden>
-          <p class="eyebrow"><span class="dot"></span> <span id="mcEyebrow"></span></p>
-          <h3 class="inclusion-title" id="mcTitle"></h3>
-          <p class="inclusion-emotional" id="mcEmotional"></p>
-          <div id="mcBody"></div>
-        </aside>
+        <!-- Bonuses INCLUDED in a session (mindset coaching, sage clearing),
+             not services she sells. Rendered from content.inclusions[]. -->
+        <div id="inclusions" hidden></div>
       </div>
     </section>
 
@@ -244,6 +242,78 @@
     </section>
 
     <!-- ============================================================
+         GATHERINGS — psychic parties + psychic expos. The ways to meet
+         Karine outside a private one-to-one session. Neither is priced,
+         so the only action is an enquiry text. Hidden when empty.
+         ============================================================ -->
+    <section class="gatherings" id="gatherings" hidden>
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow" id="gatheringsEyebrow"><span class="dot"></span></p>
+          <h2 class="split" id="gatheringsTitle"></h2>
+        </div>
+        <div class="gatherings-panels" id="gatheringsPanels"></div>
+        <div class="gatherings-cta" id="gatheringsCta"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         GIFT VOUCHERS — denominations matched to her real session prices,
+         plus a custom amount, with a live preview of the voucher itself.
+         Ordered by pre-filled SMS (no payment processing on this site).
+         Hidden when the data is removed.
+         ============================================================ -->
+    <section class="vouchers" id="vouchers" hidden>
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow" id="vouchersEyebrow"><span class="dot"></span></p>
+          <h2 class="split" id="vouchersTitle"></h2>
+          <p id="vouchersNote"></p>
+        </div>
+        <div class="vouchers-grid">
+          <!-- The example voucher. Purely a visual preview of what she sends. -->
+          <figure class="voucher-preview" id="voucherPreview" aria-live="polite">
+            <div class="voucher-card">
+              <span class="voucher-corner voucher-corner--tl" aria-hidden="true"></span>
+              <span class="voucher-corner voucher-corner--br" aria-hidden="true"></span>
+              <p class="voucher-kicker" id="voucherKicker"></p>
+              <p class="voucher-brand">Karine S. Matthews</p>
+              <p class="voucher-amount" id="voucherAmount"></p>
+              <p class="voucher-detail" id="voucherDetail"></p>
+              <div class="voucher-lines" id="voucherLines"></div>
+              <p class="voucher-foot" id="voucherFoot"></p>
+            </div>
+            <figcaption class="voucher-caption" id="voucherCaption"></figcaption>
+          </figure>
+
+          <form class="voucher-form" id="voucherForm" novalidate>
+            <fieldset class="bk-field">
+              <legend>Choose the gift</legend>
+              <div class="bk-sessions" id="voucherOptions"></div>
+            </fieldset>
+            <div class="bk-field voucher-custom" id="voucherCustomField" hidden>
+              <label for="voucherAmountInput">Amount in AUD</label>
+              <input id="voucherAmountInput" name="amount" type="text" inputmode="numeric" autocomplete="off">
+              <p class="bk-hint" id="voucherCustomHint"></p>
+            </div>
+            <div class="bk-field">
+              <label for="voucherFor">Who is it for? (optional)</label>
+              <input id="voucherFor" name="voucherFor" type="text" autocomplete="off">
+            </div>
+            <div class="bk-field">
+              <label for="voucherFrom">Who is it from? (optional)</label>
+              <input id="voucherFrom" name="voucherFrom" type="text" autocomplete="name">
+            </div>
+            <div class="form-submit">
+              <a class="btn btn-primary" id="voucherCta" href="#book">Order this voucher by text <span class="arrow">→</span></a>
+            </div>
+            <p class="form-note" id="voucherPaymentNote"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
          PENDULUM SHOP — secondary offer (hidden until real products exist)
          ============================================================ -->
     <section class="shop" id="shop" hidden>
@@ -253,7 +323,23 @@
           <h2 class="split" id="shopTitle"></h2>
           <p id="shopNote"></p>
         </div>
-        <div class="shop-grid" id="shopGrid"></div>
+        <!-- Horizontal rail (Nicholas, 2026-08-10): browsing sideways is OPTIONAL.
+             This is deliberately NOT the pinned/scrub pattern used by #journey —
+             vertical scroll must pass straight through and never be captured.
+             The track is a plain overflow-x container with CSS scroll-snap; the
+             buttons are only an affordance on top of native scrolling. -->
+        <div class="rail" id="shopRail">
+          <div class="rail-controls">
+            <button type="button" class="rail-btn" data-rail-prev aria-controls="shopGrid" aria-label="Show previous pendulums">
+              <span class="rail-arrow rail-arrow-prev" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="rail-btn" data-rail-next aria-controls="shopGrid" aria-label="Show more pendulums">
+              <span class="rail-arrow rail-arrow-next" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="rail-track" id="shopGrid" tabindex="0" role="group"
+               aria-label="Pendulums. Scroll sideways, or use the left and right arrow keys, to see them all."></div>
+        </div>
       </div>
     </section>
     <div class="divider" data-reveal></div>
@@ -401,6 +487,7 @@
           <ul>
             <li><a href="#services">Sessions</a></li>
             <li><a href="#journey">How it works</a></li>
+            <li><a href="#vouchers" data-nav="vouchers">Gift vouchers</a></li>
             <li><a href="#about">About</a></li>
             <li><a href="#faq">FAQ</a></li>
           </ul>
