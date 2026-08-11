@@ -634,17 +634,22 @@ function renderVouchers() {
 
 function renderVoices() {
   const t = content.testimonials;
-  $('#voicesTitle').textContent = t.headline;
-  if (t.subhead) $("#voicesSubhead").textContent = t.subhead;
-  $("#voicesSub").innerHTML = paras(t.sub, "voices-sub-p");
+  const section = $('#voices');
   // The featured quote is surfaced up top (early proof) — exclude it here so it never repeats.
   // A quote whose `name` is still a CONFIRM placeholder is held back entirely
   // (same rule renderSchema() uses for CONFIRM URLs). We will not invent an
   // attribution, and we will not pass a named public review off as anonymous.
-  const gridItems = (Array.isArray(t.items) ? t.items : [])
+  const gridItems = ((t && Array.isArray(t.items)) ? t.items : [])
     .filter(q => !q.featured)
     .filter(q => q.name && !/CONFIRM/.test(q.name));
+  const proofPoints = (t && Array.isArray(t.proofPoints)) ? t.proofPoints : [];
   const hasReal = gridItems.length > 0;
+  // Honest empty state: nothing real to show and no proof points → no section.
+  if (!hasReal && proofPoints.length === 0) { section.hidden = true; return; }
+  section.hidden = false;
+  $('#voicesTitle').textContent = t.headline;
+  if (t.subhead) $("#voicesSubhead").textContent = t.subhead;
+  $("#voicesSub").innerHTML = paras(t.sub, "voices-sub-p");
   if (hasReal) {
     // Her reviewers write in paragraphs too, so quotes go through paras().
     // The container is a <div> because paras() emits <p> (no <p> inside <p>).
@@ -655,10 +660,18 @@ function renderVoices() {
     // source line. An item without one is private feedback texted to her, stays
     // "A recent client" and gets NO source line. That is exactly the policy
     // Karine describes in her own intro copy above the grid.
-    $('#voicesGrid').innerHTML = gridItems.map(q => `
-      <article class="voice-card" data-reveal>
+    //
+    // Every card renders `is-clamped` + a Read-the-rest button; initVoiceClamp()
+    // then MEASURES and strips the class off any quote that already fits, so the
+    // button only ever appears where words are actually hidden.
+    $('#voicesGrid').innerHTML = gridItems.map((q, i) => `
+      <article class="voice-card is-clamped" data-reveal>
         <span class="voice-quote-mark" aria-hidden="true">“</span>
-        <div class="voice-quote">${paras(q.quote, 'voice-quote-p')}</div>
+        <div class="voice-quote" id="voiceQuote${i}">${paras(q.quote, 'voice-quote-p')}</div>
+        <button type="button" class="voice-more" aria-expanded="false" aria-controls="voiceQuote${i}">
+          <span class="voice-more-label">Read the rest</span>
+          <span class="voice-more-chev" aria-hidden="true"></span>
+        </button>
         <div class="voice-meta">
           <span class="voice-name">${q.name}</span>
           ${q.service ? `<span class="voice-service">${q.service}</span>` : ''}
@@ -667,13 +680,60 @@ function renderVoices() {
       </article>`).join('');
   } else {
     // Honest proof points until real quotes are supplied.
-    $('#voicesGrid').innerHTML = t.proofPoints.map(p => `
+    $('#voicesGrid').innerHTML = proofPoints.map(p => `
       <article class="voice-card voice-proof" data-reveal>
         <div class="voice-metric">${p.metric}</div>
         <div class="voice-label">${p.label}</div>
         <p class="voice-sub">${p.sub}</p>
       </article>`).join('');
   }
+}
+
+// ============================================================
+// VOICE CLAMP — long reviews open in place, they are never cut off.
+//
+// The rail stretches every card to the tallest, so one 673-character review
+// used to set the height for all of them (the old grid did the same thing to
+// its row). The quote clamps to nine lines in CSS; this measures which quotes
+// actually overflow and un-clamps the rest, then wires the toggle.
+//
+// Deliberately NOT a scrollable box inside the card: a nested vertical scroller
+// would eat page scroll the instant a thumb landed on it, which is precisely
+// what this rail must never do. Clipped text stays in the DOM and readable to
+// screen readers, and the button reveals it for everyone else.
+// No rAF, no ticker — a measure on load, on fonts-ready and on resize.
+// ============================================================
+function initVoiceClamp() {
+  const track = $('#voicesGrid');
+  if (!track) return;
+  const cards = $$('.voice-card.is-clamped, .voice-card.is-open', track);
+  if (!cards.length) return;
+
+  const measure = () => {
+    cards.forEach(card => {
+      if (card.classList.contains('is-open')) return;   // user opened it; leave it
+      const q = card.querySelector('.voice-quote');
+      if (!q) return;
+      card.classList.add('is-clamped');                  // clamp first, then look
+      if (q.scrollHeight <= q.clientHeight + 4) card.classList.remove('is-clamped');
+    });
+  };
+
+  track.addEventListener('click', e => {
+    const btn = e.target.closest('.voice-more');
+    if (!btn || !track.contains(btn)) return;
+    const card = btn.closest('.voice-card');
+    if (!card) return;
+    const open = card.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', String(open));
+    const label = btn.querySelector('.voice-more-label');
+    if (label) label.textContent = open ? 'Show less' : 'Read the rest';
+  });
+
+  measure();
+  // Cormorant is a webfont: the first measure can run against the fallback.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure).catch(() => {});
+  window.addEventListener('resize', measure, { passive: true });
 }
 
 function renderAbout() {
@@ -860,6 +920,7 @@ applySplits();
 initDisclosures();
 initInclusionVideos();
 initRails();
+initVoiceClamp();
 
 // ============================================================
 // PAGE-LOAD OVERTURE

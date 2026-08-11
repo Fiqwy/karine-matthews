@@ -202,7 +202,25 @@
           <p class="voices-subhead" id="voicesSubhead"></p>
           <div id="voicesSub"></div>
         </div>
-        <div class="voices-grid" id="voicesGrid"></div>
+        <!-- Horizontal rail (Nicholas, 2026-08-11): "make the reviews scroll
+             horizontally so if people wanna look at the reviews they can scroll
+             horizontally and look at it, if they don't they can keep scrolling
+             down." Same independent-rail pattern as the pendulum shop, sharing
+             its CSS and initRails() — deliberately NOT the pinned/scrub track
+             #journey uses, which would capture vertical scroll. Reading
+             sideways is optional; the page scrolls straight past. -->
+        <div class="rail" id="voicesRail">
+          <div class="rail-controls">
+            <button type="button" class="rail-btn" data-rail-prev aria-controls="voicesGrid" aria-label="Show previous reflections">
+              <span class="rail-arrow rail-arrow-prev" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="rail-btn" data-rail-next aria-controls="voicesGrid" aria-label="Show more reflections">
+              <span class="rail-arrow rail-arrow-next" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="rail-track rail-track--voices" id="voicesGrid" tabindex="0" role="group"
+               aria-label="Client reflections. Scroll sideways, or use the left and right arrow keys, to read them all."></div>
+        </div>
       </div>
     </section>
     <div class="divider" data-reveal></div>
