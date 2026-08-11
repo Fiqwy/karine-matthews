@@ -437,20 +437,17 @@ const base = {
   },
 
   // ⭐ HER REAL SOCIALS (2026-08-06), each one resolved and confirmed hers.
-  // Instagram and TikTok are both the handle @karinesmatthews, matching the
-  // domain. Facebook is the page "Reconnect with Karine S Matthews" (4.2K
-  // followers) — she has NO vanity URL, so this is the stable numeric-ID form
-  // that her /share/ link redirects to. Swap it only if she creates a vanity.
+  // Instagram and TikTok are both @karinesmatthews, matching the domain.
+  // ⚠️ FACEBOOK IS DIFFERENT ON PURPOSE — do not "tidy" it to match the others.
+  // `facebook.com/karinesmatthews` is her PERSONAL profile (Karine Matthews,
+  // 682 friends, "Mum of 4"). Sending clients there takes them away from the
+  // business page and its reviews. Her BUSINESS page vanity is
+  // `reconnectwithkarinesmatthews`, verified 2026-08-11 to resolve with no
+  // redirect to "Karine S Matthews · 4.2K followers · Psychic Medium".
+  // Fallback that always works: https://www.facebook.com/profile.php?id=61558266392714
   socials: [
     { id: "instagram", label: "Instagram", handle: "@karinesmatthews",    url: "https://www.instagram.com/karinesmatthews" },
-    // ⚠️ 2026-08-11: switched to the vanity at Nicholas's instruction — he is moving
-    // `karinesmatthews` onto the BUSINESS page. At the time of the change it still
-    // redirected to her PERSONAL profile (facebook.com/karines.matthews.5, 682 friends).
-    // Facebook allows one username per account, so the personal one must be renamed
-    // first. RE-VERIFY this resolves to the business page ("Karine S Matthews",
-    // 4.2K followers) — the fallback that definitely works is
-    // https://www.facebook.com/profile.php?id=61558266392714
-    { id: "facebook",  label: "Facebook",  handle: "@karinesmatthews",    url: "https://www.facebook.com/karinesmatthews" },
+    { id: "facebook",  label: "Facebook",  handle: "@reconnectwithkarinesmatthews", url: "https://www.facebook.com/reconnectwithkarinesmatthews" },
     { id: "tiktok",    label: "TikTok",    handle: "@karinesmatthews",    url: "https://www.tiktok.com/@karinesmatthews" }
   ],
 
