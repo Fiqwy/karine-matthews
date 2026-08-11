@@ -443,7 +443,14 @@ const base = {
   // that her /share/ link redirects to. Swap it only if she creates a vanity.
   socials: [
     { id: "instagram", label: "Instagram", handle: "@karinesmatthews",    url: "https://www.instagram.com/karinesmatthews" },
-    { id: "facebook",  label: "Facebook",  handle: "Reconnect with Karine S Matthews", url: "https://www.facebook.com/profile.php?id=61558266392714" },
+    // ⚠️ 2026-08-11: switched to the vanity at Nicholas's instruction — he is moving
+    // `karinesmatthews` onto the BUSINESS page. At the time of the change it still
+    // redirected to her PERSONAL profile (facebook.com/karines.matthews.5, 682 friends).
+    // Facebook allows one username per account, so the personal one must be renamed
+    // first. RE-VERIFY this resolves to the business page ("Karine S Matthews",
+    // 4.2K followers) — the fallback that definitely works is
+    // https://www.facebook.com/profile.php?id=61558266392714
+    { id: "facebook",  label: "Facebook",  handle: "@karinesmatthews",    url: "https://www.facebook.com/karinesmatthews" },
     { id: "tiktok",    label: "TikTok",    handle: "@karinesmatthews",    url: "https://www.tiktok.com/@karinesmatthews" }
   ],
 

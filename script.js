@@ -1424,13 +1424,24 @@ function initScrollPendulum() {
   // Degrees of travel either side.
   //
   // ⚠️ THIS NUMBER IS GEOMETRICALLY TIED TO `.swing`'s `right` OFFSET IN CSS.
-  // The image is ~4.8 times taller than it is wide, so at angle θ its bottom
-  // tip sweeps sideways by height·sinθ. At the old 15° that was 139px of travel
-  // on a 112px-wide pendulum sitting only 72px from the edge of the band, and
+  // The image is much taller than it is wide, so at angle θ its bottom tip
+  // sweeps sideways by height·sinθ. At the old 15° that was 139px of travel on
+  // a pendulum sitting only 72px from the edge of the band, and
   // `.welcome { overflow: hidden }` sliced 65.6px off the crystal cone at the
-  // far end of every swing. CSS now reserves `--swing-w * 1.35` of clearance,
-  // which covers 15° on desktop. Phones cannot spare that much width, so the
-  // arc is tightened there instead. Change one, recheck the other.
+  // far end of every swing.
+  // The cutout was re-matted on 2026-08-11 (288x1082, whole pendulum, 24px of
+  // transparent margin all round) so the clearance was re-measured against the
+  // real alpha rather than the box: at 15° the content reaches 122.0px right of
+  // the pivot with 185.8px of room. CSS reserves `--swing-w * 1` for that — see
+  // the long note on `.swing` in styles.css before touching either number.
+  // Phones cannot spare that much width, so the arc is tightened there instead.
+  // Change one, recheck the other.
+  //
+  // ⚠️ MAX CLAMPS THE TARGET, NOT THE ANGLE. The spring below overshoots its
+  // target by up to 1.495x before it settles, so the real travel is ±22.43° on
+  // desktop and ±11.96° on mobile, not ±15/±8. That is an asymptote — no scroll
+  // speed goes past it. Measure any arc-clearance change at the overshoot
+  // figure; measuring at MAX under-reserves by a third.
   const MAX = window.innerWidth <= 640 ? 8 : 15;
   let angle = 0, vel = 0, smoothed = 0, lastY = window.scrollY, visible = false;
 

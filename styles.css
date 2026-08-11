@@ -1085,32 +1085,63 @@ body.has-cursor .cursor-glow { opacity: 1; }
 /* --- Signature moment: her real pendulum, swinging on your scroll ---
    Hangs from the top edge of the dusk band. JS writes --a each frame. */
 /* ⚠️ 2026-08-10 — THE `right` OFFSET IS LOAD-BEARING, NOT DECORATION.
-   The cutout is ~4.8x taller than it is wide, so its tip sweeps sideways by
+   The cutout is much taller than it is wide, so its tip sweeps sideways by
    height x sin(angle) on every swing. It used to sit `right: clamp(.5rem,5vw,4.5rem)`
-   (72px at 1440px) while the 112 x 539px element reached 193.6px past its own
-   pivot at the 15° extreme — 65.6px further right than the band had room for.
+   (72px at 1440px) while the element reached 193.6px past its own pivot at the
+   15° extreme — 65.6px further right than the band had room for.
    `.welcome { overflow: hidden }` then sliced the crystal cone off vertically
-   at the far end of every swing ("one of the corners are not there").
-   Clearance needed is `width x 1.23` at 15°; this reserves 1.35x. If you widen
-   the pendulum, raise MAX in script.js, or reduce this, re-measure the arc. */
+   at the far end of every swing. That fix stands; the numbers below were
+   re-measured for the new asset, they were not loosened.
+
+   ⚠️ 2026-08-11 — THE ASSET CHANGED SHAPE, SO EVERY NUMBER HERE IS DERIVED.
+   The old 220 x 1059 cutout was itself cropped: opaque pixels ran off the
+   canvas on three sides and the filigree cap + the crystal's widest shoulder
+   were simply missing from the file (the second "missing corner" report — no
+   CSS could have restored them). Re-matted from her original photo to
+   288 x 1082 with the whole pendulum present and 24px of transparent margin on
+   all four sides, so a future rotation can never clip it again.
+   Everything below follows from that canvas — recompute all of it if the asset
+   is ever regenerated:
+     content box   = x 24..263, y 24..1057  (240 x 1034 inside 288 x 1082)
+     chain top     = (148.5, 24)  ->  transform-origin 51.5625% 2.218%
+     top offset    = -24/288 of --swing-w, so the chain's cut end still meets
+                     the band's top edge exactly as it did before
+     --swing-w     = old clamp x 1.3167, which keeps the RENDERED PENDULUM THE
+                     SAME HEIGHT (449px @1440). The box is wider only because it
+                     now carries the padding and the restored 10% of cap width.
+     right         = 1x --swing-w. It dropped from 1.35x because that multiple
+                     was sized against a box with no padding; measured on the
+                     real alpha, the content now reaches 122.0px right of the
+                     pivot at 15° with 185.8px of room — 63.7px spare, up from
+                     55.8px before. Do NOT "restore" 1.35x; it would shove the
+                     pendulum into the copy column for no clearance gain.
+
+   ⚠️ MEASURE THE ARC AT 22.43°, NOT AT 15°. `MAX` in script.js clamps the
+   spring's TARGET, not the angle. The damped spring overshoots its target by up
+   to 1.495x before it settles, so a hard scroll really does reach ±22.43° on
+   desktop and ±11.96° on mobile (verified live, and it is an asymptote — no
+   scroll speed exceeds it). Every clearance number above was then re-checked
+   there: 164.1px of reach against 185.8px of room, 21.6px spare on desktop and
+   9.1px on mobile — both better than the old asset managed. */
 .swing {
-  --swing-w: clamp(56px, 6.6vw, 96px);
-  position: absolute; top: 0;
-  right: max(0.75rem, calc(var(--swing-w) * 1.35));
+  --swing-w: clamp(74px, 8.69vw, 126px);
+  position: absolute;
+  top: calc(var(--swing-w) * -0.08333);
+  right: max(0.75rem, var(--swing-w));
   width: var(--swing-w); z-index: 2; pointer-events: none;
-  transform-origin: 50% 0%;
+  transform-origin: 51.5625% 2.218%;
   transform: rotate(var(--a, 0deg));
   will-change: transform;
 }
 .swing-img { width: 100%; height: auto; display: block; filter: drop-shadow(0 20px 34px rgba(12, 6, 0, 0.45)); }
 @media (max-width: 640px) {
-  /* A phone cannot spare 1.35x the width in clear space, so the arc is
-     tightened to 8° in script.js and the pendulum shrinks: at 40px wide it is
-     193px tall, sweeps 26.8px sideways at 8°, and its whole arc lands inside
-     the 390px viewport with ~3px to spare. `.welcome-inner` reserves the
+  /* A phone cannot spare the desktop clearance, so the arc is tightened to 8°
+     in script.js and the pendulum shrinks: at 53px wide the box is 199px tall,
+     its content sweeps 37.4px sideways at 8° against 54.5px of room, and the
+     whole arc lands inside the 390px viewport. `.welcome-inner` reserves the
      matching gutter below so the copy never runs under it. */
-  .swing { --swing-w: 40px; right: calc(var(--swing-w) * 0.75); opacity: 0.8; }
-  .welcome-inner { padding-right: 2.6rem; }
+  .swing { --swing-w: 53px; right: calc(var(--swing-w) * 0.55); opacity: 0.8; }
+  .welcome-inner { padding-right: 3.3rem; }
 }
 @media (prefers-reduced-motion: reduce) { .swing { display: none; } }
 
