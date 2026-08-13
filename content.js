@@ -241,7 +241,7 @@ const base = {
   gallery: {
     eyebrow: "The space",
     emotional: "A room that holds you. <em>Step in and exhale.</em>",
-    note: "A glimpse of the sacred space where in-person sessions are held, in the Gold Coast Hinterland.",
+    note: "A glimpse of the sacred space where in-person sessions are held in the Gold Coast Hinterland, and the same purple velvet and crystals she carries wherever she reads.",
     // ⭐ 2026-08-10 — the photos were DELIBERATELY thinned here, not lost.
     // Four of the seven now live further up the page (readings card, Reiki card,
     // the sage panel and the psychic-parties panel) so the writing is broken up
@@ -249,10 +249,23 @@ const base = {
     // The tiles below render UNCROPPED (masonry columns, natural height) — the
     // old fixed 240px row plus object-fit:cover was cutting her portrait shots
     // in half on a laptop.
-    // ⏭️ Her new expo photos drop straight in here as more items.
+    // ⭐ 2026-08-13 — two of her four new photos landed here (the other two, the
+    // ones with HER in them, went to the Psychic Expos panel where they do more
+    // work). These two are set-ups with nobody at the table, which is exactly
+    // what this section is: the space, not the session.
+    // ⚠️ Neither is her Gilston room — the walls, floor and furniture are all
+    // different from `07-room.jpg`. They are DELIBERATELY left with no
+    // `category`, so no tag claims a place we cannot verify, and the `note`
+    // above now covers both honestly. Do not tag them "The room".
     items: [
       { src: "assets/space/01-table.jpg",        alt: "Karine's reading table with crystal spheres, tarot cards and tumbled stones", category: "space" },
+      { src: "assets/expo/04-evening-setup.webp", alt: "An evening set-up: a purple velvet table with a lit crystal sphere and a pendulum, beside a live-edge timber bench, trailing plants and Karine's roll-up banner" },
       { src: "assets/space/06-crystal-ball.jpg", alt: "Clear quartz sphere, sage and crystals on the altar",                          category: "tools" },
+      // 03-banner-and-tables.webp was pulled on 2026-08-13. At render width its
+      // chalkboard was legible and read "Pouchic Reading · 15min $35 · 30min $70":
+      // a misspelling of her own profession on her own signage, plus prices that
+      // contradict both this site and the board in 01. Do not reinstate it unless
+      // she reshoots the board. The other three expo photos are clean.
       { src: "assets/space/07-room.jpg",         alt: "Karine's sacred reading room in Gilston",                                      category: "space" }
     ],
     categories: [
@@ -291,7 +304,20 @@ const base = {
         // ⭐ KARINE'S OWN EXPO COPY, verbatim (2026-08-10). The panel title is ours.
         eyebrow: "Come and say hello",
         title: "Psychic Expos",
-        blurb: "Throughout the year, you can also find me at a selection of local psychic expos. They're a wonderful opportunity to meet in person, experience a mini reading, ask questions, and see if my work resonates with you."
+        blurb: "Throughout the year, you can also find me at a selection of local psychic expos. They're a wonderful opportunity to meet in person, experience a mini reading, ask questions, and see if my work resonates with you.",
+        // ⭐ 2026-08-13 — her own expo photos, the first imagery this panel has
+        // ever had. `images[]` (plural) is a DIFFERENT renderer from the single
+        // `image` used by the parties panel above: that one crops to a narrow
+        // side column, which would have cut Karine out of two portrait shots.
+        // These render as a full-width uncropped pair beneath the copy.
+        // ⚠️ HONESTY: we do not know which expo either was taken at, so neither
+        // carries an event name or a date, and neither alt line repeats the
+        // banner's service list (the banner still says "Mindset Coach", which
+        // on this site is an included bonus, not a bookable service).
+        images: [
+          { src: "assets/expo/01-karine-at-table.webp", alt: "Karine seated at her table at a psychic expo, her roll-up banner beside her, with a crystal ball, a chalkboard sign and her business cards on a purple velvet cloth" },
+          { src: "assets/expo/02-karine-at-stand.webp", alt: "Karine smiling at her expo stand in a cream jumper, a crystal ball and cards on the purple velvet table in front of her and her roll-up banner standing to the right" }
+        ]
       }
     ],
     // No prices or mechanics have been set for either, so this is an enquiry,

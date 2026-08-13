@@ -397,6 +397,19 @@ function panelHtml(c) {
     </div>`;
   }
   const hasMedia = !!(c.video || c.image);
+  // `images[]` is the OTHER media shape: a full-width row of uncropped photos
+  // under the copy, instead of one cropped photo in a side column. The expos
+  // panel uses it because its shots are portrait and `.inclusion-media`'s
+  // object-fit: cover would slice Karine out of both. Same rules as the
+  // atmosphere grid: natural height, nothing cropped, honest empty state if a
+  // file 404s (the figure removes itself, and an empty row collapses).
+  const gallery = (Array.isArray(c.images) && c.images.length)
+    ? `<div class="inclusion-gallery">${c.images.map(im => `
+        <figure class="inclusion-shot">
+          <img src="${im.src}" alt="${im.alt || ''}" loading="lazy" decoding="async"
+               onerror="this.parentElement.remove()">
+        </figure>`).join('')}</div>`
+    : '';
   return `
     <aside class="inclusion${hasMedia ? ' has-media' : ''}${c.video ? ' has-video' : ''}" data-reveal>
       ${media}
@@ -405,6 +418,7 @@ function panelHtml(c) {
         <h3 class="inclusion-title">${c.title}</h3>
         ${c.emotional ? `<p class="inclusion-emotional">${c.emotional}</p>` : ''}
         ${copy}
+        ${gallery}
       </div>
     </aside>`;
 }
