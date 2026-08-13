@@ -249,17 +249,14 @@ const base = {
     // The tiles below render UNCROPPED (masonry columns, natural height) — the
     // old fixed 240px row plus object-fit:cover was cutting her portrait shots
     // in half on a laptop.
-    // ⭐ 2026-08-13 — two of her four new photos landed here (the other two, the
-    // ones with HER in them, went to the Psychic Expos panel where they do more
-    // work). These two are set-ups with nobody at the table, which is exactly
-    // what this section is: the space, not the session.
-    // ⚠️ Neither is her Gilston room — the walls, floor and furniture are all
-    // different from `07-room.jpg`. They are DELIBERATELY left with no
-    // `category`, so no tag claims a place we cannot verify, and the `note`
-    // above now covers both honestly. Do not tag them "The room".
+    // ⚠️ 2026-08-13 — this section is HER GILSTON ROOM ONLY. All four of her new
+    // expo photos live in the Psychic Expos panel instead. One of them briefly
+    // sat here and Nicholas moved it out, correctly: those photos are venues she
+    // travels to, not the room she reads in, so filing them under "The space"
+    // implied a place they are not. If a future photo is not demonstrably her
+    // Gilston room, it does not belong in this array.
     items: [
       { src: "assets/space/01-table.jpg",        alt: "Karine's reading table with crystal spheres, tarot cards and tumbled stones", category: "space" },
-      { src: "assets/expo/04-evening-setup.webp", alt: "An evening set-up: a purple velvet table with a lit crystal sphere and a pendulum, beside a live-edge timber bench, trailing plants and Karine's roll-up banner" },
       { src: "assets/space/06-crystal-ball.jpg", alt: "Clear quartz sphere, sage and crystals on the altar",                          category: "tools" },
       // 03-banner-and-tables.webp was pulled on 2026-08-13. At render width its
       // chalkboard was legible and read "Pouchic Reading · 15min $35 · 30min $70":
@@ -316,7 +313,13 @@ const base = {
         // on this site is an included bonus, not a bookable service).
         images: [
           { src: "assets/expo/01-karine-at-table.webp", alt: "Karine seated at her table at a psychic expo, her roll-up banner beside her, with a crystal ball, a chalkboard sign and her business cards on a purple velvet cloth" },
-          { src: "assets/expo/02-karine-at-stand.webp", alt: "Karine smiling at her expo stand in a cream jumper, a crystal ball and cards on the purple velvet table in front of her and her roll-up banner standing to the right" }
+          { src: "assets/expo/02-karine-at-stand.webp", alt: "Karine smiling at her expo stand in a cream jumper, a crystal ball and cards on the purple velvet table in front of her and her roll-up banner standing to the right" },
+          // Moved out of the gallery on 2026-08-13 at Nicholas's instruction, and
+          // it belongs here on the facts: this is a venue at night, not her
+          // Gilston reading room, so filing it under "The space" implied a place
+          // it is not. It is the same roll-up banner and travel set-up as the two
+          // above.
+          { src: "assets/expo/04-evening-setup.webp", alt: "An evening set-up: a purple velvet table with a lit crystal sphere and a pendulum, beside a live-edge timber bench, trailing plants and Karine's roll-up banner" }
         ]
       }
     ],

@@ -232,7 +232,21 @@ function initInclusionVideos() {
     if (mount.dataset.label) { v.setAttribute('role', 'img'); v.setAttribute('aria-label', mount.dataset.label); }
     v.src = src;
     mount.appendChild(v);
-    const p = v.play(); if (p && typeof p.catch === 'function') p.catch(() => {});
+
+    // Only decode while it is actually on screen. Without this the sage clip
+    // kept decoding the whole way down the page — including while the visitor
+    // is still in the hero, where it competed with the hero video for decode
+    // and composite budget and bought nothing. Same rule the scroll pendulum
+    // already follows. rootMargin starts it just before it scrolls into view
+    // so it is never caught mid-black-frame.
+    const play = () => { const p = v.play(); if (p && typeof p.catch === 'function') p.catch(() => {}); };
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(es => {
+        es[0].isIntersecting ? play() : v.pause();
+      }, { rootMargin: '200px' }).observe(v);
+    } else {
+      play();
+    }
   });
 }
 

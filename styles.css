@@ -1462,8 +1462,13 @@ body::after {
    the photo's own ratio (`height: auto`), exactly like the atmosphere grid.
    ⚠️ Do NOT give these a fixed height or object-fit: cover — same bug, same
    photos, and it was measured once already. --- */
+/* Was a hard 2-up, which orphaned a lone third photo on its own row with a
+   dead half-row beside it. auto-fit lets the row take however many she has,
+   so 2, 3 or 4 photos all fill their row instead of leaving a gap. The
+   min() keeps a single item from being forced wider than the panel. */
 .inclusion-gallery {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
   gap: clamp(0.7rem, 1.6vw, 1rem);
   margin-top: clamp(1.1rem, 2.4vw, 1.5rem);
 }
