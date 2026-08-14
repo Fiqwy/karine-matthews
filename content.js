@@ -340,10 +340,22 @@ const base = {
   //    SMS, exactly like the pendulum shop. Nothing is ever charged here and
   //    there is no fake success state.
   //  • The preview card is a DESIGN MOCK of what she sends, drawn from the
-  //    design tokens. It carries no serial number, no expiry and no terms,
-  //    because none have been agreed with her.
-  // ⏭️ CONFIRM with Karine: voucher expiry/validity, and whether she wants a
-  //    printable PDF or just a message she forwards.
+  //    design tokens. It carries no serial number.
+  //
+  // ⚖️ 2026-08-14 — GIFT CARD LAW. Since 1 Nov 2019 the Australian Consumer Law
+  //    (Div 3A of Pt 3-2, inserted by the Treasury Laws Amendment (Gift Cards)
+  //    Act 2018) requires most gift cards sold to consumers to stay redeemable
+  //    for AT LEAST 3 YEARS, and the expiry must be PROMINENTLY DISPLAYED. If
+  //    the validity is written as a period ("3 years") the ISSUE DATE must be
+  //    shown too, so the holder can work out the expiry. Strict liability, max
+  //    penalty $6,000 for a person other than a body corporate (Karine is a
+  //    sole trader). None of the exemptions fit her: her vouchers are not
+  //    reloadable, not donated, not discounted, not loyalty or promotional, and
+  //    not for a service available only for a limited period.
+  //    → `validityYears` below drives BOTH the voucher card and terms.html.
+  //      Do not shorten it below 3, and do not remove the dates from the card.
+  // ⏭️ CONFIRM with Karine: whether she wants a printable voucher PDF or just a
+  //    message she forwards.
   vouchers: {
     eyebrow: "Gift vouchers",
     emotional: "Give someone the answer they have been carrying. <em>A session, when they are ready for it.</em>",
@@ -361,18 +373,38 @@ const base = {
       placeholder: "Amount in AUD",
       hint: "Any amount you like. It goes toward whichever session they choose."
     },
-    // Wording that appears ON the example voucher card.
+    // ⚖️ How long a voucher lasts. The law sets a 3-year FLOOR; this is the
+    // number the card, the terms and the shop copy all read from.
+    validityYears: 3,
+    // Wording that appears ON the example voucher card. The issue date and the
+    // expiry are BOTH printed, which is what makes the card compliant.
     preview: {
       kicker: "Gift voucher",
       forLabel: "For",
       forPlaceholder: "Their name",
       fromLabel: "From",
       fromPlaceholder: "Your name",
+      issuedLabel: "Issued",
+      expiresLabel: "Valid until",
       foot: "Redeemable on any session with Karine S. Matthews · Gilston, or online worldwide"
     },
     cta: { label: "Order this voucher by text" },
     // Shown under the CTA so nobody expects to pay on the page.
-    paymentNote: "There is no checkout here. Text me what you'd like and I'll confirm the details and send you my PayID or bank transfer details, the same as a session booking."
+    paymentNote: "There is no checkout here. Text me what you'd like and I'll confirm the details and send you my PayID or bank transfer details, the same as a session booking.",
+    // ⚖️ The short, human version of the voucher terms. Kept to four lines on
+    // purpose: the full version lives in terms.html#vouchers.
+    // ⚠️ The refund line must stay exactly this shape. A blanket "no refunds"
+    // is itself a breach of the ACL (s18/s29) because the consumer guarantees
+    // survive any policy wording, so change of mind is named as the limit AND
+    // the ACL is expressly preserved. Do not shorten it to "non-refundable".
+    termsHeading: "The fine print, kindly",
+    terms: [
+      "Your voucher is valid for 3 years from the day it is bought. The issue date and the expiry are both written on it.",
+      "It can go toward any session with me, whether that is a reading or a Reiki healing, in person or online.",
+      "If the session costs more than the voucher, you simply pay the difference. If it costs less, the rest stays on the voucher until it expires.",
+      "Vouchers cannot be swapped for cash or refunded if you change your mind. That does not take away your rights under the Australian Consumer Law."
+    ],
+    termsLink: { label: "Read the full voucher terms", href: "terms.html#vouchers" }
   },
 
   testimonials: {
@@ -509,8 +541,18 @@ const base = {
     {
       q: "Where are you based?",
       a: "In Gilston, in the Gold Coast Hinterland, Queensland. In-person sessions are held here, and online sessions reach beautiful souls all over the world."
+    },
+    // ⚖️ 2026-08-14 — the cancellation policy and the voucher validity now
+    // exist, so they belong where people actually look for them. Both mirror
+    // terms.html word for word in substance. If you change one, change both.
+    {
+      q: "What if I need to cancel or change my time?",
+      a: "Just let me know at least 24 hours before your session and we will find another time, with no fee. If it is less than 24 hours, or if you do not make it at all, a session you have already paid for may not be able to be moved. Life happens though, so please talk to me."
+    },
+    {
+      q: "How long does a gift voucher last?",
+      a: "Three years from the day it is bought. The issue date and the expiry are both written on the voucher, so there is never any guessing. It can go toward any session with me."
     }
-    // Cancellation / rescheduling policy and gift vouchers — CONFIRM and add.
   ],
 
   cta: {
@@ -563,6 +605,321 @@ const base = {
       online: "Online: payment needs to be in my account and cleared before your session starts.",
       // No account numbers on a public page - she sends them on confirmation.
       methods: "I accept PayID or bank transfer, and I will send you my details once we have confirmed your time."
+    }
+  },
+
+  // ============================================================
+  // ⚖️ LEGAL PAGES — privacy.html · terms.html · disclaimer.html
+  // ------------------------------------------------------------
+  // Rendered by legal.js, which builds the whole page (doc + footer) from
+  // this block. Three separate documents, three separate URLs, one <h1> each.
+  //
+  // WHY THIS EXISTS (verified 2026-08-14, sources in the section comments):
+  //  • PRIVACY — the Privacy Act's $3M small-business exemption does NOT reach
+  //    a health service provider, and the OAIC names complementary therapists
+  //    as an example. Reiki is a complementary therapy, so Karine is very
+  //    likely an APP entity and APP 1.3 requires a clearly expressed, current
+  //    privacy policy. She also holds sensitive information: a selfie of every
+  //    client, plus whatever they tell her about their health and state of mind.
+  //  • TERMS — the gift vouchers need the 3-year rule in writing (see the
+  //    `vouchers` block above), and the booking, payment and cancellation
+  //    arrangements were nowhere on the site.
+  //  • DISCLAIMER — no health claims, no outcome promises (ACL s18).
+  //
+  // ⛔ THREE THINGS THAT MUST NOT BE "TIDIED":
+  //  1. NEVER write a blanket "no refunds" anywhere. The Australian Consumer
+  //     Law consumer guarantees cannot be excluded, restricted or modified, and
+  //     wording that implies otherwise is itself a breach (ACL s18/s29 — the
+  //     ACCC enforces this hard). Change of mind may be excluded; the
+  //     guarantees may not. Every refund line here names change of mind AND
+  //     expressly preserves the ACL. Keep both halves.
+  //  2. NO HEALTH CLAIMS. Reiki is never said to treat, cure, heal or relieve
+  //     anything. "Reiki is a complement to, not a replacement for, medical
+  //     care" is her own line, already on the site, and is reused verbatim.
+  //  3. NO INVENTED FACTS. No ABN, no email, no company number, no insurance,
+  //     no professional-body membership. `brand.abn` is empty and the business
+  //     line hides itself; fill the token in and it appears on all three pages.
+  //
+  // `{phone}` in any string is replaced with brand.phone at render time, so the
+  // number lives in exactly one place.
+  legal: {
+    // ⏭️ Bump this whenever you change the wording of any document below.
+    updated: "14 August 2026",
+    updatedLabel: "Last updated",
+    backLabel: "Back to the site",
+    // Order here drives the footer links and the cross-links between the pages.
+    order: ["privacy", "terms", "disclaimer"],
+    docs: {
+
+      privacy: {
+        slug: "privacy.html",
+        navLabel: "Privacy",
+        title: "Privacy Policy",
+        metaDescription: "How Karine S. Matthews collects, uses and protects your personal information, written to the Australian Privacy Principles.",
+        intro: "What you share with me is private. This explains exactly what I collect, why I need it, how long I keep it, and what you can ask me to do with it.",
+        sections: [
+          {
+            h: "Why I have a privacy policy",
+            p: [
+              "I am a sole trader working from Gilston in the Gold Coast Hinterland. Part of what I offer is Reiki, which counts as a health service under the Privacy Act 1988, so the Australian Privacy Principles apply to my practice no matter how small it is. I am glad they do.",
+              "This policy is written plainly, because you should not need a lawyer to understand what happens to your own information."
+            ]
+          },
+          {
+            h: "What I collect",
+            p: ["Only what I need in order to hold your session."],
+            list: [
+              "Your name.",
+              "Your phone number, because everything with me is arranged by text.",
+              "A recent selfie, which I ask you to send before a reading.",
+              "Whatever you choose to tell me: the days and times that suit you, what you would like me to look at, your questions, and anything you share in a message or during your session. That can include things about your health, your relationships and how you are feeling.",
+              "A postal address, but only if you have ordered a pendulum and need it sent to you."
+            ],
+            after: ["That is the lot. There is no account to create, and there is no form on my website that quietly sends me anything."]
+          },
+          {
+            h: "Why I collect it",
+            p: [
+              "To arrange your session and to be able to write back to you. To prepare properly before we meet. To post you a pendulum or send you a gift voucher if you have ordered one. And to keep a simple record of what we agreed.",
+              "I do not use your information for advertising, and I will not add you to a mailing list."
+            ]
+          },
+          {
+            h: "Your selfie",
+            p: [
+              "Before a reading I ask for a fresh selfie so I can tune into your energy and sense what Spirit may wish to bring through. Preparing for your session is the only thing it is ever used for.",
+              "I delete your photo once your session is finished. It is not filed away, not kept on a computer, not posted anywhere and not shown to anyone."
+            ]
+          },
+          {
+            h: "What you tell me stays with me",
+            p: [
+              "I do not sell your personal information, and I do not share, trade or hand it to anyone else for their own purposes. What is said in a session is not repeated.",
+              "The only time I would ever pass something on is if the law required it, or if I genuinely believed someone's life or safety was at risk.",
+              "Some of the reviews on my website were written publicly by clients on my Facebook page. Those are shown as a first name and last initial, and each one says where it came from. Anything shared with me privately stays anonymous unless you have told me otherwise."
+            ]
+          },
+          {
+            h: "Online sessions",
+            p: [
+              "Online readings happen over FaceTime, WhatsApp or Zoom. Those services are run by companies based overseas, so your call travels through their systems the way any video call does, and their own privacy terms apply to that part of it.",
+              "I do not record sessions unless you ask me to and I have agreed to it."
+            ]
+          },
+          {
+            h: "This website",
+            p: [
+              "My website sets no tracking cookies and there is no analytics watching what you do on it.",
+              "There is also nothing on it that sends me anything. Every Book and Order button simply writes a message for you and opens your own phone's messaging app. Nothing reaches me until you have read it and pressed send yourself.",
+              "The one thing the site loads from somewhere else is the typeface it is set in, which comes from Google Fonts."
+            ]
+          },
+          {
+            h: "How I look after it, and how long I keep it",
+            p: [
+              "I take reasonable steps to keep what you share with me safe, private and out of anyone else's hands.",
+              "Your selfie is deleted after your session. Anything else I keep only for as long as I genuinely need it, and then I get rid of it."
+            ]
+          },
+          {
+            h: "Seeing, correcting or deleting your information",
+            p: [
+              "You can ask me at any time what I hold about you, ask me to correct anything that is wrong, or ask me to delete it altogether. Text or call me on {phone} and I will take care of it, normally within a few days, and it costs you nothing.",
+              "If there is ever a reason I cannot do what you have asked, I will tell you what that reason is."
+            ]
+          },
+          {
+            h: "If you are not happy",
+            p: [
+              "Please tell me first. Text or call me on {phone} and I will listen and do my best to put it right. I will respond within 30 days.",
+              "If you are still not satisfied, you are entitled to take it further with the Office of the Australian Information Commissioner, which is the national privacy regulator. They can be reached at oaic.gov.au or on 1300 363 992."
+            ]
+          },
+          {
+            h: "Getting in touch",
+            p: [
+              "There is no email address for my practice, by choice. Text or call me on {phone} and it comes straight to me."
+            ]
+          },
+          {
+            h: "Changes to this policy",
+            p: [
+              "If anything here changes I will update this page and change the date at the top of it."
+            ]
+          }
+        ]
+      },
+
+      terms: {
+        slug: "terms.html",
+        navLabel: "Terms",
+        title: "Terms",
+        metaDescription: "Booking, payment, cancellations, pendulums and gift voucher terms for sessions with Karine S. Matthews.",
+        intro: "How booking, paying, cancelling, pendulums and gift vouchers work. Written plainly, because you should be able to read it in a couple of minutes.",
+        sections: [
+          {
+            h: "About these terms",
+            p: [
+              "These are the everyday terms for booking a session with me, ordering a pendulum, or buying a gift voucher.",
+              "Nothing on this page takes away your rights under the Australian Consumer Law. Those rights come with anything you buy in Australia, and they cannot be signed away by you or by me."
+            ]
+          },
+          {
+            h: "Booking a session",
+            p: [
+              "Everything is arranged by text. When you tap a Book button on my website it writes the message for you and opens your own messaging app. Nothing is sent until you press send, and nothing is booked at that moment.",
+              "Your session is confirmed once I have written back and we have both agreed on a time."
+            ]
+          },
+          {
+            h: "Prices",
+            p: [
+              "The price of every session is shown on my website in Australian dollars, and that is what you pay. There are no booking fees and no surcharges.",
+              "Mindset coaching and Guided Sage Cleansing are included in a session when they are needed, at no extra cost. Neither is sold separately."
+            ]
+          },
+          {
+            h: "Paying",
+            p: [
+              "For a session in person in Gilston, you are welcome to pay cash on the day.",
+              "For an online session, payment needs to be in my account and cleared before we begin. I accept PayID or bank transfer, and I send you those details privately once your time is confirmed.",
+              "My account details are never published on my website, and I will never ask you for your card numbers by text."
+            ]
+          },
+          {
+            id: "cancellations",
+            h: "Changing or cancelling a session",
+            p: [
+              "If you need to cancel or move your session, please give me at least 24 hours notice. There is no fee for that, and we will simply find another time that suits you.",
+              "With less than 24 hours notice, or if you do not make it at all, a session you have already paid for may not be able to be moved or refunded. I hold that time just for you and turn other people away for it. Life happens though, so please talk to me.",
+              "If I ever have to change your time, I will let you know as soon as I can and we will reschedule, or you can have your money back.",
+              "This is a change-of-mind policy and it does not affect your rights under the Australian Consumer Law."
+            ]
+          },
+          {
+            id: "pendulums",
+            h: "Pendulums",
+            p: [
+              "Pendulums are $30 each and are ordered by text, the same way a session is booked. There is no checkout on my website.",
+              "Every pendulum is natural stone, so the colour, the markings and the shape vary a little from the photo. That is part of the charm of them.",
+              "Once payment is confirmed I post yours within Australia. I will confirm the postage with you before you pay anything. If it does not arrive, or it arrives damaged, tell me and I will make it right.",
+              "If a pendulum arrives broken, or it is not what I described, you are entitled to a repair, a replacement or a refund under the consumer guarantees. That is your right, not a favour. If you have simply changed your mind, I am not able to refund it, although you are always welcome to ask."
+            ]
+          },
+          {
+            id: "vouchers",
+            h: "Gift vouchers",
+            p: [
+              "A gift voucher is valid for 3 years from the day it is bought. Both the issue date and the date it runs out are written on the voucher itself, so nobody has to work it out.",
+              "A voucher can go toward any session with me: a reading or a Reiki healing, in person or online. Whoever you give it to has exactly the same rights over it as you do.",
+              "If the session chosen costs more than the voucher, the difference is paid on the day. If it costs less, whatever is left stays on the voucher until it expires.",
+              "There are no fees of any kind on a voucher. It does not lose value while it waits, and it costs nothing to use.",
+              "Vouchers cannot be exchanged for cash, and they are not refundable if you change your mind. That does not limit anyone's rights under the Australian Consumer Law, and that applies to the person who receives the voucher just as much as to the person who bought it.",
+              "Please look after it the way you would look after cash. If it goes missing, tell me and I will do what I can to help.",
+              "Vouchers are ordered by text and I send yours through once payment is confirmed."
+            ]
+          },
+          {
+            h: "Refunds and your consumer rights",
+            p: [
+              "You are always entitled to the consumer guarantees under the Australian Consumer Law. If something I provide is not delivered with due care and skill, is not fit for the purpose I described, or does not match what I told you, you may be entitled to a refund, a replacement or compensation for a reasonable loss. Nothing on this page changes any of that.",
+              "Where I say something is not refundable, I am talking about changing your mind. I am not talking about the guarantees above, because those cannot be excluded by anybody.",
+              "If something has gone wrong, please tell me. I would far rather hear about it than not."
+            ]
+          },
+          {
+            h: "Sessions are one to one",
+            p: [
+              "Readings are one-on-one, so that I can connect fully with your energy without distraction. If you would like something for a group, my Psychic Parties are made for exactly that."
+            ]
+          },
+          {
+            h: "Guidance, not advice",
+            p: [
+              "My readings and healings are offered for guidance and personal insight. They are not a substitute for professional advice, and no particular outcome is promised. Please read the disclaimer as well, because it forms part of these terms."
+            ]
+          },
+          {
+            h: "If these terms change",
+            p: [
+              "If anything here changes I will update this page and change the date at the top of it. The terms that apply to your session are the ones on this page at the time you book."
+            ]
+          },
+          {
+            h: "Getting in touch",
+            p: [
+              "Text or call me on {phone}. There is no email address for my practice."
+            ]
+          }
+        ]
+      },
+
+      disclaimer: {
+        slug: "disclaimer.html",
+        navLabel: "Disclaimer",
+        title: "Disclaimer",
+        metaDescription: "Readings and Reiki with Karine S. Matthews are offered for guidance and personal insight, and are not a substitute for professional advice.",
+        intro: "What my work is, and what it is not. Please read this before you book.",
+        sections: [
+          {
+            h: "Guidance, not advice",
+            p: [
+              "Everything I offer is for guidance, reflection and personal insight. What comes through in a reading is my honest interpretation of what I sense, and it is yours to take or to leave.",
+              "You are always the one who decides what to do with it."
+            ]
+          },
+          {
+            h: "Not a substitute for professional advice",
+            p: [
+              "Nothing I offer is a substitute for professional medical, legal, financial or psychological advice, and it is not a replacement for care from a qualified professional.",
+              "Please do not start, stop or change any treatment, medication or professional advice because of something said in a session. Speak to your doctor or your adviser.",
+              "I do not diagnose, and I do not treat medical or psychological conditions."
+            ]
+          },
+          {
+            h: "About Reiki",
+            p: [
+              // ⭐ Her own line, already live in the FAQ. Reused word for word.
+              "Reiki is a complement to, not a replacement for, medical care.",
+              "It is a gentle, deeply relaxing practice, and many people simply feel calmer and lighter afterwards. I make no claim that it treats, cures or relieves any illness or condition, and I would never suggest you use it instead of seeing a doctor."
+            ]
+          },
+          {
+            h: "No outcome is promised",
+            p: [
+              "I cannot and do not promise any particular result, outcome or event. No reading can reliably tell you what the future holds, and anyone who tells you otherwise is not being straight with you.",
+              "What I can promise is honesty, care, and my full attention for the time we have together.",
+              "The future is not fixed, and your choices are your own."
+            ]
+          },
+          {
+            h: "Adults only",
+            p: [
+              "My sessions are for adults aged 18 and over. If you are under 18, please do not book a session with me."
+            ]
+          },
+          {
+            h: "If you are struggling",
+            p: [
+              "A reading is not crisis support. If you are in distress, or you are worried about your safety or someone else's, please reach out to someone who can help right now.",
+              "Lifeline is on 13 11 14, at any hour of the day or night. In an emergency, call 000."
+            ]
+          },
+          {
+            h: "Your decisions are your own",
+            p: [
+              "By booking a session you accept that you are responsible for the choices you make, including any decision you make after a reading or a healing. Please use your own judgement, and get professional advice wherever it matters.",
+              "None of this limits your rights under the Australian Consumer Law."
+            ]
+          },
+          {
+            h: "Getting in touch",
+            p: [
+              "If anything here is unclear, please ask me before you book. Text or call me on {phone}."
+            ]
+          }
+        ]
+      }
     }
   },
 

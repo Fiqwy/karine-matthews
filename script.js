@@ -603,6 +603,39 @@ function renderVouchers() {
   $('#voucherCaption').textContent = 'An example of the voucher Karine sends through.';
   if (v.custom && v.custom.hint) $('#voucherCustomHint').textContent = v.custom.hint;
 
+  // ⚖️ VALIDITY ON THE CARD. The example is dated today, because that is what a
+  // voucher bought today would actually say. Both dates are printed: the ACL
+  // wants the expiry displayed prominently, and where validity is expressed as
+  // a period ("3 years") the issue date has to be there as well so the holder
+  // can work the expiry out. `validityYears` is the single source of the term.
+  const years = Number(v.validityYears) || 3;
+  const issued = new Date();
+  const expires = new Date(issued.getFullYear() + years, issued.getMonth(), issued.getDate());
+  const longDate = (d) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+  const validity = $('#voucherValidity');
+  if (validity) {
+    validity.innerHTML =
+      `<span class="voucher-validity-row"><span class="voucher-validity-label">${v.preview.issuedLabel}</span> ${longDate(issued)}</span>` +
+      `<span class="voucher-validity-row"><span class="voucher-validity-label">${v.preview.expiresLabel}</span> ${longDate(expires)}</span>`;
+  }
+
+  // ⚖️ The short terms. Rendered from content so the wording lives in one file.
+  // ⚠️ The change-of-mind line must keep its ACL sentence — see content.js.
+  const termsHost = $('#voucherTerms');
+  const termsList = (v.terms && v.terms.length) ? v.terms : [];
+  if (termsHost) {
+    termsHost.hidden = !termsList.length;
+    if (termsList.length) {
+      const link = v.termsLink
+        ? `<p class="voucher-terms-link"><a href="${v.termsLink.href}">${v.termsLink.label}</a></p>`
+        : '';
+      termsHost.innerHTML =
+        `<h3 class="voucher-terms-title">${v.termsHeading || 'The fine print'}</h3>` +
+        `<ul class="voucher-terms-list">${termsList.map(t => `<li>${t}</li>`).join('')}</ul>` +
+        link;
+    }
+  }
+
   const all = opts.concat(v.custom ? [Object.assign({ isCustom: true, amount: null }, v.custom)] : []);
   $('#voucherOptions').innerHTML = all.map((o, i) => `
     <label class="bk-session${i === 0 ? ' is-selected' : ''}">
@@ -866,6 +899,19 @@ function renderFooter() {
   ).join('');
   $('#footerCopy').textContent = `© ${new Date().getFullYear()} ${content.brand.name}${content.brand.abn ? ` · ABN ${content.brand.abn}` : ''}`;
   $('#footerRegion').textContent = content.brand.region;
+
+  // ⚖️ Privacy · Terms · Disclaimer. Quiet, in the bottom row, rendered from
+  // content.legal so index.html and the legal pages can never fall out of step.
+  // Hidden entirely if the legal block is ever removed (honest empty state).
+  const legalHost = $('#footerLegal');
+  const L = content.legal;
+  if (legalHost) {
+    const keys = (L && L.docs) ? (L.order || Object.keys(L.docs)).filter(k => L.docs[k]) : [];
+    legalHost.hidden = !keys.length;
+    legalHost.innerHTML = keys
+      .map(k => `<a href="${L.docs[k].slug}">${L.docs[k].navLabel}</a>`)
+      .join('');
+  }
 }
 
 function renderNav() {

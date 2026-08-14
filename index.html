@@ -299,6 +299,10 @@
               <p class="voucher-amount" id="voucherAmount"></p>
               <p class="voucher-detail" id="voucherDetail"></p>
               <div class="voucher-lines" id="voucherLines"></div>
+              <!-- ⚖️ Issue date + expiry, both on the card. The ACL requires the
+                   expiry to be prominently displayed, and where validity is
+                   expressed as a period the issue date must be shown too. -->
+              <p class="voucher-validity" id="voucherValidity"></p>
               <p class="voucher-foot" id="voucherFoot"></p>
             </div>
             <figcaption class="voucher-caption" id="voucherCaption"></figcaption>
@@ -328,6 +332,8 @@
             <p class="form-note" id="voucherPaymentNote"></p>
           </form>
         </div>
+        <!-- ⚖️ The short voucher terms. The full version is terms.html#vouchers. -->
+        <aside class="voucher-terms" id="voucherTerms" hidden></aside>
       </div>
     </section>
 
@@ -522,6 +528,8 @@
       <div class="footer-bottom">
         <span id="footerCopy">© Karine S. Matthews</span>
         <span id="footerRegion">Gilston, Gold Coast Hinterland, QLD</span>
+        <!-- Privacy · Terms · Disclaimer, rendered from content.legal -->
+        <nav class="footer-legal" id="footerLegal" aria-label="Legal"></nav>
       </div>
     </div>
   </footer>

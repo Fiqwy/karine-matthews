@@ -46,6 +46,16 @@
      worst case is now 4.93:1. */
   --gold-ink:     #7F5610;
   --on-gold:      #241305;   /* ink that sits ON a gold fill (buttons, chips) */
+  /* The DARK END of the primary button's gradient, and only that.
+     --gold-deep (#7E5412) was doing this job and it fails AA: --on-gold on it is
+     2.70:1, and sampled where the label actually sits it was 3.96:1 (3.42:1 under
+     the arrow) against the 4.5 a 16px/600 label needs. That is the site's main
+     CTA, 19 of them. It hid from earlier sweeps because averaging a gradient's
+     stops reads ~5:1 and passes — always sample the DARKEST stop under the text.
+     Deliberately a separate token: --gold-deep still has to stay deep for the
+     foil text gradient and the gold type that sits on cream, where lightening it
+     would break contrast the other way. */
+  --gold-btn-end: #AF7C24;
   --gold-soft:    rgba(176, 124, 36, 0.10);
   --gold-line:    rgba(176, 124, 36, 0.42);
 
@@ -251,7 +261,7 @@ section { padding-block: var(--gap-section); position: relative; }
   transition: transform 220ms var(--ease-out), background 220ms var(--ease-out), box-shadow 220ms var(--ease-out);
 }
 .btn-primary {
-  background: linear-gradient(135deg, var(--gold-warm) 0%, var(--gold) 55%, var(--gold-deep) 100%);
+  background: linear-gradient(135deg, var(--gold-warm) 0%, var(--gold) 55%, var(--gold-btn-end) 100%);
   color: var(--on-gold);
   box-shadow: var(--glow-warm), inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
@@ -1577,6 +1587,57 @@ body::after {
   font-size: 0.76rem; line-height: 1.5; color: var(--dusk-text-muted); margin: 0;
 }
 .voucher-caption { margin-top: 0.9rem; text-align: center; font-size: 0.82rem; color: var(--text-muted); }
+
+/* ⚖️ Issue date + expiry, printed on the card itself. Kept on the card rather
+   than only in the terms because the ACL wants the expiry displayed
+   prominently, and a gift is often forwarded on without the page around it. */
+.voucher-validity {
+  position: relative; z-index: 1;
+  display: grid; gap: 0.25rem; text-align: left;
+  margin: 0 0 1.1rem; padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--dusk-line);
+}
+.voucher-validity-row {
+  display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;
+  font-size: 0.84rem; color: var(--dusk-text);
+}
+.voucher-validity-label {
+  flex: 0 0 auto; font-family: var(--font-body); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--dusk-text-muted);
+}
+
+/* ⚖️ The short voucher terms, spanning both columns under the card and form.
+   Four lines, not a wall. The full version is terms.html#vouchers. */
+.voucher-terms {
+  grid-column: 1 / -1;
+  margin-top: clamp(0.4rem, 1.6vw, 1rem);
+  padding: var(--pad-card);
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+.voucher-terms[hidden] { display: none; }
+.voucher-terms-title {
+  font-family: var(--font-display); font-size: 1.16rem; font-weight: 600;
+  color: var(--text-primary); margin: 0 0 0.9rem;
+}
+.voucher-terms-list {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; gap: 0.6rem; max-width: 70ch;
+}
+.voucher-terms-list li {
+  position: relative; padding-left: 1.5rem;
+  font-size: 0.94rem; color: var(--text-body);
+}
+.voucher-terms-list li::before {
+  content: ''; position: absolute; left: 0; top: 0.66em;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--gold); opacity: 0.85;
+}
+.voucher-terms-link { margin: 1rem 0 0; }
+.voucher-terms-link a {
+  display: inline-flex; align-items: center; min-height: 44px;
+  font-size: 0.9rem; color: var(--gold-ink); border-bottom: 1px solid var(--gold-line);
+}
+.voucher-terms-link a:hover { color: var(--rose-deep); border-bottom-color: var(--rose-line); }
 .voucher-form {
   background: var(--surface-1); border: 1px solid var(--line); border-radius: var(--r-lg);
   padding: clamp(1.4rem, 3vw, 2.4rem);
@@ -1611,4 +1672,123 @@ body::after {
      underline already does the separating, so the dots go. */
   .hero-tagline { letter-spacing: 0.1em; gap: 0.4rem 0.9rem; padding-top: 0.9rem; }
   .hero-tagline .tagline-dot { display: none; }
+}
+
+/* ============================================================
+   ⚖️ LEGAL PAGES — privacy.html · terms.html · disclaimer.html
+   ------------------------------------------------------------
+   A reading document, not a landing page: one narrow column,
+   generous leading, no motion, no reveal states. Tokens only.
+   These pages never get the `has-js` class, so nothing here may
+   rely on .foil-line or [data-reveal] to become visible.
+   ============================================================ */
+.legal-page { background: var(--surface); }
+
+/* -------- header -------- */
+.legal-nav {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  position: sticky; top: 0; z-index: 20;
+  backdrop-filter: blur(10px);
+}
+.legal-nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; min-height: 68px; padding-block: 0.6rem;
+}
+.legal-brand {
+  font-family: var(--font-display); font-weight: 600; font-size: 1.24rem;
+  letter-spacing: 0.16em; color: var(--text-primary);
+  display: inline-flex; align-items: center; min-height: 44px;
+}
+.legal-brand:hover { color: var(--gold-ink); }
+.legal-nav-cta { padding: 0.7rem 1.3rem; font-size: 0.86rem; }
+
+/* -------- the document -------- */
+.legal-main { padding-block: clamp(2.5rem, 6vw, 4.5rem) var(--gap-section-tight); }
+.legal-doc { color: var(--text-body); }
+/* `section { padding-block: var(--gap-section) }` is the page-level rhythm and
+   is far too much between the clauses of one document. */
+.legal-doc .legal-section { padding-block: 0; margin-top: clamp(2rem, 4vw, 2.9rem); }
+
+.legal-back { margin: 0 0 1.6rem; }
+.legal-back a {
+  display: inline-flex; align-items: center; min-height: 44px;
+  font-size: 0.88rem; letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.legal-back a:hover { color: var(--gold-ink); }
+
+.legal-head { padding-bottom: clamp(1.4rem, 3vw, 2rem); border-bottom: 1px solid var(--line); }
+.legal-doc h1 {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(2.3rem, 5.4vw, 3.6rem); line-height: 1.1;
+  letter-spacing: -0.012em; color: var(--text-primary); margin: 0;
+}
+.legal-intro {
+  margin: 1rem 0 0; max-width: 52ch;
+  font-size: 1.06rem; color: var(--text-body);
+}
+.legal-meta {
+  margin: 1.5rem 0 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1.1rem;
+  font-size: 0.83rem; letter-spacing: 0.05em; color: var(--text-muted);
+}
+.legal-meta-business { position: relative; }
+.legal-meta-business::before {
+  content: '·'; position: absolute; left: -0.68rem; color: var(--gold-ink);
+}
+
+.legal-doc h2 {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(1.5rem, 2.9vw, 1.95rem); line-height: 1.18;
+  color: var(--text-primary); margin: 0 0 0.85rem;
+}
+.legal-doc .legal-section p { margin: 0 0 1rem; max-width: 66ch; }
+.legal-doc .legal-section p:last-child { margin-bottom: 0; }
+
+.legal-list {
+  list-style: none; padding: 0; margin: 0 0 1rem;
+  display: grid; gap: 0.75rem; max-width: 66ch;
+}
+.legal-list li { position: relative; padding-left: 1.5rem; }
+.legal-list li::before {
+  content: ''; position: absolute; left: 0; top: 0.72em;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--gold); opacity: 0.85;
+}
+
+/* -------- closing panel -------- */
+.legal-aside {
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+  padding: var(--pad-card);
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-soft);
+}
+.legal-aside p { margin: 0 0 1rem; }
+.legal-aside p:last-child { margin-bottom: 0; }
+.legal-aside-lead {
+  font-family: var(--font-display); font-size: 1.3rem;
+  color: var(--text-primary); line-height: 1.3;
+}
+.legal-crosslinks { font-size: 0.9rem; color: var(--text-muted); }
+.legal-crosslinks a {
+  display: inline-flex; align-items: center; min-height: 44px;
+  color: var(--gold-ink); margin-right: 1.1rem;
+  border-bottom: 1px solid var(--gold-line);
+}
+.legal-crosslinks a:hover { color: var(--rose-deep); border-bottom-color: var(--rose-line); }
+
+/* -------- the quiet legal row in the footer (both here and on index) -------- */
+.footer-legal { display: flex; flex-wrap: wrap; gap: 0 1.1rem; }
+.footer-legal a { font-size: 0.82rem; color: var(--dusk-text-muted); }
+.footer-legal a:hover { color: var(--gold-bright); }
+
+@media (max-width: 640px) {
+  .legal-nav-cta { padding: 0.65rem 1rem; font-size: 0.8rem; }
+  .legal-brand { font-size: 1.08rem; letter-spacing: 0.12em; }
+  /* The business line sits under the date on a phone, so its leading dot
+     separator would be dangling in mid-air. */
+  .legal-meta { flex-direction: column; gap: 0.2rem; }
+  .legal-meta-business::before { content: none; }
 }
