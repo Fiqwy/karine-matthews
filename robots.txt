@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://karinematthews.com.au/sitemap.xml
+Sitemap: https://karinesmatthews.com/sitemap.xml

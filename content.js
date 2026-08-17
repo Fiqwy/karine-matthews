@@ -41,8 +41,8 @@ const base = {
     region: "Gilston, Gold Coast Hinterland, QLD",
     servesInPerson: "Gilston, Gold Coast Hinterland",
     servesOnline: "Online worldwide",
-    abn: "",                                         // CONFIRM (if registered)
-    domain: "karinematthews.com.au"                  // CONFIRM
+    abn: "86 285 752 012",                           // her real ABN — verified on ABR 2026-08-17 (sole trader, active)
+    domain: "karinesmatthews.com"
   },
 
   hero: {
@@ -636,9 +636,9 @@ const base = {
   //  2. NO HEALTH CLAIMS. Reiki is never said to treat, cure, heal or relieve
   //     anything. "Reiki is a complement to, not a replacement for, medical
   //     care" is her own line, already on the site, and is reused verbatim.
-  //  3. NO INVENTED FACTS. No ABN, no email, no company number, no insurance,
-  //     no professional-body membership. `brand.abn` is empty and the business
-  //     line hides itself; fill the token in and it appears on all three pages.
+  //  3. NO INVENTED FACTS. No email, no company number, no insurance, no
+  //     professional-body membership. `brand.abn` holds her real ABN
+  //     (ABR-verified 2026-08-17) and renders on all three pages + the footer.
   //
   // `{phone}` in any string is replaced with brand.phone at render time, so the
   // number lives in exactly one place.
@@ -930,8 +930,8 @@ const base = {
     name: "Karine S. Matthews",
     description: "Psychic medium and Reiki healer in Gilston, Gold Coast Hinterland. Intuitive psychic mediumship readings in person and online worldwide, and Reiki healing in person.",
     priceRange: "$$",
-    image: "https://karinematthews.com.au/assets/og/og-image.jpg",   // CONFIRM domain
-    url: "https://karinematthews.com.au/",                           // CONFIRM domain
+    image: "https://karinesmatthews.com/assets/og/og-image.jpg",
+    url: "https://karinesmatthews.com/",
     telephone: "+61404098706",                                       // CONFIRM
     // No `email` node — she asked for email to be removed (2026-08-10).
     address: {                                                     // locality only — honest for a home practice
