@@ -644,7 +644,7 @@ const base = {
   // number lives in exactly one place.
   legal: {
     // ⏭️ Bump this whenever you change the wording of any document below.
-    updated: "14 August 2026",
+    updated: "18 August 2026",
     updatedLabel: "Last updated",
     backLabel: "Back to the site",
     // Order here drives the footer links and the cross-links between the pages.
@@ -709,7 +709,7 @@ const base = {
           {
             h: "This website",
             p: [
-              "My website sets no tracking cookies and there is no analytics watching what you do on it.",
+              "My website uses a simple, cookie-free visit counter so I can see how many people visit and how many tap the booking buttons. It sets no cookies, does not follow you to other websites, and cannot identify you personally.",
               "There is also nothing on it that sends me anything. Every Book and Order button simply writes a message for you and opens your own phone's messaging app. Nothing reaches me until you have read it and pressed send yourself.",
               "The one thing the site loads from somewhere else is the typeface it is set in, which comes from Google Fonts."
             ]
