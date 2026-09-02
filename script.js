@@ -1406,6 +1406,49 @@ function renderBooking() {
 
   $('#bkFocus').placeholder = b.focusPlaceholder || '';
   $('#bkSelfie').textContent = b.selfieNote || '';
+
+  // ⭐ PAYMENT QUESTION — she was asking every enquirer by hand. Options carry
+  // an `inPersonOnly` flag; applySelection() below gates them on the format.
+  const payOpts = (b.payment && b.payment.options) || [];
+  const payField = $('#bkPayField');
+  if (payField) {
+    if (!payOpts.length) {
+      payField.hidden = true;
+    } else {
+      $('#bkPayLegend').textContent = b.payment.question || 'How would you like to pay?';
+      // Built with DOM APIs rather than innerHTML: the value lands in an
+      // ATTRIBUTE, and an unescaped quote there is exactly the bug class that
+      // bit the Content Studio before. Nothing here is ever parsed as HTML.
+      const payBox = $('#bkPayOpts');
+      payBox.textContent = '';
+      payOpts.forEach((o, i) => {
+        const label = document.createElement('label');
+        label.className = 'bk-radio';
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'payment';
+        radio.value = o.value;
+        radio.dataset.inperson = String(!!o.inPersonOnly);
+        radio.checked = i === 0;
+        const span = document.createElement('span');
+        span.textContent = o.value;
+        label.append(radio, span);
+        payBox.appendChild(label);
+      });
+      $('#bkPayHint').textContent = b.payment.hint || '';
+    }
+  }
+
+  // ⭐ PHOTO PICKER — labels only; the file handling is initPhotoPicker().
+  const ph = b.photo || {};
+  if ($('#bkPhotoField')) {
+    $('#bkPhotoLabel').textContent = ph.label || '';
+    $('#bkPhotoBtn').textContent = ph.chooseLabel || 'Choose a photo';
+    $('#bkPhotoChange').textContent = ph.changeLabel || 'Change';
+    $('#bkPhotoRemove').textContent = ph.removeLabel || 'Remove';
+    $('#bkPhotoNote').textContent = ph.privacyNote || '';
+  }
+
   if (b.payment) {
     $('#bkPayment').innerHTML = `
       <h3>${b.payment.heading}</h3>
@@ -1437,7 +1480,30 @@ function renderBooking() {
       hint.textContent = 'Readings are available in person, or online worldwide.';
     }
     // Platform only matters for an online session.
-    if (platformBox) platformBox.hidden = !(online && online.checked && !online.disabled);
+    const isOnlineNow = !!(online && online.checked && !online.disabled);
+    if (platformBox) platformBox.hidden = !isOnlineNow;
+
+    // Cash can only ever apply to an in-person session — online payment has to
+    // be cleared BEFORE the session starts, which is her rule, not ours.
+    // Same mechanism as the Reiki/Online gate above, reversed.
+    const payRadios = $$('#bkPayOpts input');
+    let bumped = false;
+    payRadios.forEach(r => {
+      const cashOnly = r.dataset.inperson === 'true';
+      const blocked = cashOnly && isOnlineNow;
+      r.disabled = blocked;
+      r.closest('.bk-radio').classList.toggle('is-disabled', blocked);
+      if (blocked && r.checked) { r.checked = false; bumped = true; }
+    });
+    // Never leave the group with nothing chosen after bumping cash off.
+    if (bumped) {
+      const next = payRadios.find(r => !r.disabled);
+      if (next) next.checked = true;
+    }
+    const payHint = $('#bkPayHint');
+    if (payHint && b.payment) {
+      payHint.textContent = (isOnlineNow && b.payment.onlineHint) ? b.payment.onlineHint : (b.payment.hint || '');
+    }
   }
   wrap.addEventListener('change', applySelection);
   $('#bkFormat').addEventListener('change', applySelection);
@@ -1450,6 +1516,8 @@ function renderBooking() {
     const match = wrap.querySelector(`input[data-service="${a.dataset.book}"]`);
     if (match) { match.checked = true; applySelection(); }
   });
+
+  const photo = initPhotoPicker();
 
   form.addEventListener('submit', e => {
     e.preventDefault();
@@ -1465,14 +1533,153 @@ function renderBooking() {
     const questions = form.questions.value.trim();
     const name = form.name.value.trim();
     const phone = form.phone.value.trim();
+    const pay = (form.querySelector('input[name="payment"]:checked') || {}).value || '';
     let body = `Hi Karine! I'd like to book: ${sessionLabel(s)}. Format: ${fmt}.`;
     if (when) body += ` Times that suit me: ${when}.`;
     if (focus) body += ` I'd love you to focus on: ${focus}.`;
     if (questions) body += ` My questions: ${questions}.`;
     body += ` My name: ${name || '-'}${phone ? ', phone: ' + phone : ''}.`;
-    body += ` (Selfie attached.)`;
+    if (pay) body += ` Paying by: ${pay}.`;
+    // ⚠️ HONESTY: this line used to read "(Selfie attached.)" unconditionally,
+    // so Karine was told a photo was coming even when none was. It now reports
+    // what actually happened, so she knows when to chase one.
+    const file = photo.file();
+    body += file ? ` Photo: I'm sending one now.` : ` Photo: I haven't sent one yet.`;
+
+    // Reveal the hand-off BEFORE navigating away — the sms: link hands the
+    // screen to the messages app, and this needs to be waiting on return.
+    if (file) photo.showHandoff();
     window.location.href = `${content.booking.smsHref}?&body=${encodeURIComponent(body)}`;
   });
+}
+
+// ============================================================
+// PHOTO PICKER + HAND-OFF
+// ------------------------------------------------------------
+// ⚠️ AN `sms:` LINK CANNOT CARRY A FILE. No web standard allows it. So the
+// booking text goes by SMS (pre-addressed to her, nothing lost) and the photo
+// is handed off separately through the visitor's OWN share sheet, straight
+// into the same conversation.
+//
+// The image NEVER leaves the device and is NEVER uploaded. That is deliberate:
+// her privacy policy promises "Your selfie is deleted after your session", and
+// she holds sensitive information as a likely APP entity. Do not "improve"
+// this by POSTing the file anywhere.
+// ============================================================
+function initPhotoPicker() {
+  const input   = $('#bkPhoto');
+  const preview = $('#bkPhotoPreview');
+  const thumb   = $('#bkPhotoThumb');
+  const nameEl  = $('#bkPhotoName');
+  const errEl   = $('#bkPhotoError');
+  const btn     = $('#bkPhotoBtn');
+  const remove  = $('#bkPhotoRemove');
+  const panel   = $('#bkHandoff');
+  const ph      = (content.booking && content.booking.photo) || {};
+
+  let file = null;
+  let objectUrl = null;
+
+  const noop = { file: () => null, showHandoff: () => {} };
+  if (!input || !preview || !panel) return noop;
+
+  function clearPreview() {
+    // Always revoke before dropping the reference, or the blob leaks.
+    if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; }
+    file = null;
+    thumb.removeAttribute('src');
+    preview.hidden = true;
+    if (btn) btn.hidden = false;
+    // If they already sent once, retract the hand-off — it would otherwise sit
+    // there asking them to send a photo they have just removed.
+    panel.hidden = true;
+    panel.classList.remove('is-open');
+  }
+
+  input.addEventListener('change', () => {
+    const picked = input.files && input.files[0];
+    errEl.hidden = true;
+    if (!picked) { clearPreview(); return; }
+    if (!picked.type || !picked.type.startsWith('image/')) {
+      input.value = '';
+      clearPreview();
+      errEl.textContent = ph.notAnImage || 'That file is not a photo. Please choose an image.';
+      errEl.hidden = false;
+      return;
+    }
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    file = picked;
+    objectUrl = URL.createObjectURL(file);
+    thumb.src = objectUrl;
+    nameEl.textContent = file.name;
+    preview.hidden = false;
+    if (btn) btn.hidden = true;
+  });
+
+  if (remove) {
+    remove.addEventListener('click', () => {
+      input.value = '';
+      clearPreview();
+      errEl.hidden = true;
+    });
+  }
+
+  // Can this browser actually push a file into the share sheet? iOS Safari and
+  // Android Chrome can; most desktops cannot. Checked per-file, as the spec
+  // requires, and re-checked at hand-off time.
+  function canShareFile(f) {
+    try { return !!(navigator.canShare && navigator.share && navigator.canShare({ files: [f] })); }
+    catch (_) { return false; }
+  }
+
+  const heading  = $('#bkHandoffHeading');
+  const bodyEl   = $('#bkHandoffBody');
+  const shareBtn = $('#bkHandoffBtn');
+
+  if (shareBtn) {
+    shareBtn.addEventListener('click', () => {
+      if (!file) return;
+      // ⚠️ navigator.share MUST be called directly inside the gesture, with no
+      // await before it, or Safari rejects it as a non-user-activated share.
+      // The File is already in hand, so nothing async is needed here.
+      // Files only — the text already went by SMS; sharing it again would
+      // duplicate the whole message in her thread.
+      navigator.share({ files: [file] }).catch(err => {
+        // Cancelling the share sheet is a choice, not a failure. Leave the
+        // panel up so they can try again.
+        if (err && err.name === 'AbortError') return;
+        showFallback();
+      });
+    });
+  }
+
+  function showFallback() {
+    if (shareBtn) shareBtn.hidden = true;
+    const phone = (content.booking && content.booking.phone) || '';
+    bodyEl.textContent = (ph.handoffFallback || '').replace('{phone}', phone);
+  }
+
+  function showHandoff() {
+    if (!file) return;
+    heading.textContent = ph.handoffHeading || '';
+    if (canShareFile(file)) {
+      bodyEl.textContent = ph.handoffBody || '';
+      if (shareBtn) {
+        shareBtn.textContent = ph.handoffButton || 'Send my photo';
+        shareBtn.hidden = false;
+      }
+    } else {
+      showFallback();
+    }
+    panel.hidden = false;
+    // One frame so the reveal transition has something to animate from.
+    // ⚠️ No requestAnimationFrame loop here — a single frame, then done.
+    requestAnimationFrame(() => panel.classList.add('is-open'));
+    const focusTarget = (shareBtn && !shareBtn.hidden) ? shareBtn : panel;
+    try { focusTarget.focus({ preventScroll: true }); } catch (_) {}
+  }
+
+  return { file: () => file, showHandoff };
 }
 
 // ============================================================

@@ -596,15 +596,60 @@ const base = {
     hoursNote: "These are the times I read. Wednesdays I am closed, and weekends are afternoons only.",
     platforms: ["FaceTime", "WhatsApp", "Zoom"],     // shown only when Online is chosen
     focusPlaceholder: "For example, any particular area of your life you would like me to look at: personal, relationships, work or career.",
-    // The SMS app lets you attach a photo before sending, so this is a real
-    // instruction, not a promise the site cannot keep.
+    // Her words for WHY she wants a selfie. The form now has a real picker for
+    // it (booking.photo below), so this reads as the reason, not the mechanism.
     selfieNote: "Before you hit send, please attach a recent selfie. I tune into your energy from it and see what Spirit may reveal ahead of your session.",
+
+    // ⭐ THE PHOTO SPOT (added 2026-09-02, at Karine's request).
+    //
+    // ⚠️ READ THIS BEFORE "IMPROVING" IT. An `sms:` link CANNOT carry a file —
+    // no web standard allows it — so the photo is handed off separately, phone
+    // to phone, through the visitor's own share sheet (navigator.share).
+    // It NEVER touches a server, and that is deliberate: her privacy policy
+    // promises "Your selfie is deleted after your session" (see legal.privacy
+    // below), and she is very likely an APP entity holding sensitive
+    // information. Uploading selfies anywhere would break that promise.
+    // Do not "fix" this by POSTing the image somewhere.
+    photo: {
+      label: "Your photo",
+      // Shown on the picker button before a photo is chosen.
+      chooseLabel: "Choose a photo",
+      changeLabel: "Change",
+      removeLabel: "Remove",
+      // The honest reassurance. True as written — keep it true.
+      privacyNote: "Your photo stays on your phone. It is only ever sent through your own messages app, never uploaded to this website.",
+      // Shown if they pick something that is not an image.
+      notAnImage: "That file is not a photo. Please choose an image.",
+      // The hand-off panel, revealed after the message is sent.
+      handoffHeading: "One more thing — your photo",
+      handoffBody: "Your message is on its way. Tap below to send your photo into the same conversation.",
+      handoffButton: "Send my photo to Karine",
+      // Fallback wording where the browser cannot share a file (desktop).
+      // {phone} is replaced with booking.phone at render time.
+      handoffFallback: "Your message is on its way. To send your photo, open your messages app, find the message you just sent to {phone}, and attach it there."
+    },
+
     payment: {
       heading: "Payment",
       inPerson: "In person: you can pay cash on the day.",
       online: "Online: payment needs to be in my account and cleared before your session starts.",
       // No account numbers on a public page - she sends them on confirmation.
-      methods: "I accept PayID or bank transfer, and I will send you my details once we have confirmed your time."
+      methods: "I accept PayID or bank transfer, and I will send you my details once we have confirmed your time.",
+
+      // ⭐ THE PAYMENT QUESTION (added 2026-09-02, at Karine's request).
+      // She was having to ask "how are you paying?" on every single enquiry.
+      // The answer now rides in the SMS she receives.
+      question: "5 · How would you like to pay?",
+      // `inPersonOnly` hides the option once Online is chosen — her rule is that
+      // online payment must be CLEARED before the session, so cash never applies.
+      // Enforced in applySelection() in script.js; do not remove the flag.
+      options: [
+        { value: "Cash on the day", inPersonOnly: true },
+        { value: "PayID" },
+        { value: "Bank transfer" }
+      ],
+      hint: "Just so I know — I'll send you my details once we've confirmed your time.",
+      onlineHint: "Online sessions are paid before we begin, so cash isn't available for those."
     }
   },
 

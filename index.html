@@ -465,8 +465,13 @@
               <label for="bkQuestions">Any questions for me? (optional)</label>
               <textarea id="bkQuestions" name="questions"></textarea>
             </div>
+            <fieldset class="bk-field" id="bkPayField">
+              <legend id="bkPayLegend"></legend>
+              <div class="bk-radios" id="bkPayOpts"></div>
+              <p class="bk-hint" id="bkPayHint"></p>
+            </fieldset>
             <fieldset class="bk-field">
-              <legend>5 · Your details</legend>
+              <legend>6 &middot; Your details</legend>
               <div class="field-row">
                 <div class="bk-field">
                   <label for="bkName">Your full name</label>
@@ -478,9 +483,31 @@
                 </div>
               </div>
               <p class="bk-selfie" id="bkSelfie"></p>
+              <div class="bk-photo" id="bkPhotoField">
+                <span class="bk-photo-label" id="bkPhotoLabel"></span>
+                <input class="bk-photo-input" id="bkPhoto" name="photo" type="file" accept="image/*">
+                <label class="bk-photo-btn" id="bkPhotoBtn" for="bkPhoto"></label>
+                <figure class="bk-photo-preview" id="bkPhotoPreview" hidden>
+                  <img id="bkPhotoThumb" src="" alt="" decoding="async">
+                  <figcaption>
+                    <span class="bk-photo-name" id="bkPhotoName"></span>
+                    <span class="bk-photo-actions">
+                      <label class="bk-photo-action" id="bkPhotoChange" for="bkPhoto"></label>
+                      <button class="bk-photo-action" id="bkPhotoRemove" type="button"></button>
+                    </span>
+                  </figcaption>
+                </figure>
+                <p class="bk-photo-error" id="bkPhotoError" role="alert" hidden></p>
+                <p class="bk-photo-note" id="bkPhotoNote"></p>
+              </div>
             </fieldset>
             <div class="form-submit">
               <button type="submit" class="btn btn-primary">Send my booking request <span class="arrow">→</span></button>
+            </div>
+            <div class="bk-handoff" id="bkHandoff" role="status" aria-live="polite" tabindex="-1" hidden>
+              <h3 id="bkHandoffHeading"></h3>
+              <p id="bkHandoffBody"></p>
+              <button class="btn btn-primary" id="bkHandoffBtn" type="button" hidden></button>
             </div>
             <p class="form-note" id="formNote"></p>
             <div class="bk-payment" id="bkPayment"></div>

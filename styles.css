@@ -884,6 +884,7 @@ body.has-cursor .cursor-glow { opacity: 1; }
 .booking-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: clamp(1.6rem, 4vw, 3.2rem); align-items: start; }
 .booking-form { background: var(--surface-1); border: 1px solid var(--line); border-radius: var(--r-lg); padding: clamp(1.4rem, 3vw, 2.4rem); display: grid; gap: 1.1rem; }
 .bk-field { border: 0; margin: 0; padding: 0; display: grid; gap: 0.5rem; min-inline-size: 0; }
+.bk-field[hidden] { display: none; }
 .bk-field legend, .bk-field > label { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); letter-spacing: 0.01em; padding: 0; }
 .bk-field input[type="text"], .bk-field input[type="tel"], .bk-field textarea {
   width: 100%; padding: 0.85rem 1rem; background: var(--panel-lift); border: 1px solid var(--line);
@@ -1016,6 +1017,82 @@ body.has-cursor .cursor-glow { opacity: 1; }
   font-size: 0.86rem; line-height: 1.55; color: var(--text-body);
   background: var(--rose-soft); border-left: 2px solid var(--rose);
   padding: 0.75rem 0.9rem; border-radius: 0 var(--r-sm) var(--r-sm) 0; margin-top: 0.2rem;
+}
+
+/* ------------------------------------------------------------
+   PHOTO PICKER — a real spot to add the selfie she asks for.
+   The file never leaves the device; see initPhotoPicker() in script.js.
+   ------------------------------------------------------------ */
+.bk-photo { margin-top: 0.9rem; display: grid; gap: 0.6rem; justify-items: start; }
+.bk-photo-label { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+
+/* Visually hidden, NOT display:none — it must stay in the tab order and stay
+   reachable by its <label for>. Same trick as .bk-radio input. */
+.bk-photo-input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+
+.bk-photo-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.7rem 1.1rem; min-height: 44px;
+  border: 1px dashed var(--gold-ink); border-radius: var(--r-pill);
+  background: var(--gold-soft); color: var(--text-primary);
+  font-size: 0.92rem; cursor: pointer;
+  transition: background 180ms var(--ease-out), border-color 180ms var(--ease-out);
+}
+.bk-photo-btn::before { content: '+'; font-size: 1.1rem; line-height: 1; color: var(--gold-ink); }
+/* [hidden] is only (0,1,0), same as a class — an author `display` beats the UA
+   rule, so anything given a display here must opt back out explicitly.
+   Same fix as .bk-platform[hidden] above. */
+.bk-photo-btn[hidden] { display: none; }
+.bk-photo-btn:hover { background: rgba(176, 124, 36, 0.18); }
+.bk-photo-input:focus-visible + .bk-photo-btn { outline: 2px solid var(--gold-ink); outline-offset: 2px; }
+/* Once a photo is chosen the button is hidden, so the focus ring has to land
+   on the preview instead — otherwise tabbing to the input shows nothing. */
+.bk-photo-input:focus-visible ~ .bk-photo-preview { outline: 2px solid var(--gold-ink); outline-offset: 2px; }
+
+.bk-photo-preview {
+  display: flex; align-items: center; gap: 0.8rem; margin: 0;
+  padding: 0.6rem; border: 1px solid var(--line); border-radius: var(--r-sm);
+  background: var(--gold-soft); max-width: 100%;
+}
+.bk-photo-preview img {
+  width: 56px; height: 56px; flex: 0 0 56px;
+  object-fit: cover; border-radius: var(--r-sm); display: block;
+}
+.bk-photo-preview[hidden] { display: none; }
+.bk-photo-preview figcaption { display: grid; gap: 0.3rem; min-width: 0; }
+.bk-photo-name {
+  font-size: 0.88rem; color: var(--text-body);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;
+}
+.bk-photo-actions { display: flex; gap: 0.9rem; }
+.bk-photo-action {
+  font-size: 0.82rem; color: var(--gold-ink); text-decoration: underline;
+  cursor: pointer; background: none; border: 0; padding: 0.2rem 0; font-family: inherit;
+}
+.bk-photo-action:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 2px; }
+.bk-photo-error { font-size: 0.86rem; color: var(--rose-deep); }
+.bk-photo-note { font-size: 0.82rem; line-height: 1.55; color: var(--text-muted); }
+
+/* ------------------------------------------------------------
+   HAND-OFF PANEL — appears once the message is on its way, so the photo
+   can follow it into the same conversation.
+   ------------------------------------------------------------ */
+.bk-handoff {
+  margin-top: 1rem; padding: 1.1rem;
+  border: 1px solid var(--gold-line, var(--line)); border-radius: var(--r-sm);
+  background: var(--gold-soft);
+  opacity: 0; transform: translateY(6px);
+  transition: opacity 320ms var(--ease-out), transform 320ms var(--ease-out);
+}
+.bk-handoff.is-open { opacity: 1; transform: none; }
+.bk-handoff .btn[hidden] { display: none; }
+.bk-handoff:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 2px; }
+.bk-handoff h3 { font-size: 1rem; margin-bottom: 0.4rem; color: var(--text-primary); }
+.bk-handoff p { font-size: 0.92rem; line-height: 1.6; color: var(--text-body); margin-bottom: 0.9rem; }
+.bk-handoff p:last-child { margin-bottom: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bk-handoff { transition: none; opacity: 1; transform: none; }
 }
 
 /* Payment explainer */
