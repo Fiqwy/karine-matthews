@@ -565,6 +565,25 @@ const base = {
   booking: {
     mode: "sms",                                     // SMS-first (mirrors Goldy)
     smsHref: "sms:+61404098706",                     // CONFIRM — all booking CTAs resolve here + a pre-filled ?&body=
+
+    // ⭐ THE DURABLE HALF OF THE BOOKING PATH (added 2026-09-16, after a lost enquiry).
+    //
+    // A visitor in Canada filled in this form, was told her message was on its way, and
+    // Karine never received it. Nothing had been sent: the browser refused to launch the
+    // sms: link, which is what every desktop does and what plenty of overseas phones do.
+    // Because the site had no server anywhere in the path, there was no record that the
+    // woman had ever been here, and her enquiry could not be recovered.
+    //
+    // So the booking now posts here FIRST and opens the messages app second. The text
+    // still carries everything; this carries enough for Karine to ring them back.
+    //
+    // ⚠️ WHAT GOES TO THE SERVER IS DELIBERATELY NARROW: name, phone, and the choices
+    // made with radio buttons. The "focus" and "questions" boxes below invite grief,
+    // health and relationship disclosures, and Karine is very likely an APP entity
+    // holding sensitive information, so that text travels ONLY in her own message app
+    // and is never stored. Do not widen this without rewriting legal.privacy first.
+    leadEndpoint: "https://donny.appliedintelligence.biz/api/webhook/site-lead",
+    leadSlug: "karine-matthews",                     // same slug the visitor beacon uses
     phone: "0404 098 706",
     phoneHref: "tel:+61404098706",
     // ⭐ No email fallback. Karine asked for the email sections to be removed
@@ -620,13 +639,65 @@ const base = {
       privacyNote: "Your photo stays on your phone. It is only ever sent through your own messages app, never uploaded to this website.",
       // Shown if they pick something that is not an image.
       notAnImage: "That file is not a photo. Please choose an image.",
-      // The hand-off panel, revealed after the message is sent.
-      handoffHeading: "One more thing — your photo",
-      handoffBody: "Your message is on its way. Tap below to send your photo into the same conversation.",
+
+      // ⚠️ THESE TWO STRINGS USED TO LIE (fixed 2026-09-16).
+      // Both opened with "Your message is on its way." and both were written BEFORE the
+      // sms: link was even attempted, so on every desktop the visitor was told a message
+      // had been sent that never existed. They now describe the photo and nothing else.
+      // The sentence about what actually happened to the booking is chosen at send time
+      // from booking.outcome below, where it can be told the truth.
       handoffButton: "Send my photo to Karine",
-      // Fallback wording where the browser cannot share a file (desktop).
-      // {phone} is replaced with booking.phone at render time.
-      handoffFallback: "Your message is on its way. To send your photo, open your messages app, find the message you just sent to {phone}, and attach it there."
+      // Appended when the browser can push the file into the visitor's own share sheet.
+      photoShare: "You chose a photo to go with this. Tap below to send it into the same conversation.",
+      // Appended when it cannot (most desktops). {phone} becomes booking.phone.
+      photoManual: "You chose a photo to go with this. To send it, open your messages app, find your message to {phone}, and attach it there."
+    },
+
+    // ⭐ WHAT THE VISITOR IS TOLD AFTER THEY PRESS SEND (added 2026-09-16).
+    //
+    // There are two independent things that can succeed or fail: the enquiry reaching
+    // Karine's system, and the messages app opening. That is four outcomes, and the site
+    // now says which one actually happened instead of asserting the happy one. Never
+    // reintroduce a single blanket "your message is on its way" here — that sentence is
+    // what cost her a client. {phone} becomes booking.phone.
+    outcome: {
+      // Stored AND the messages app opened. The best case, and still not a promise that
+      // she has pressed send, because she has not.
+      bothHeading: "Your enquiry is with Karine",
+      bothBody: "Your messages app has opened with your booking in it. Press send there when you are ready. Karine has your enquiry either way, so nothing is lost.",
+
+      // Stored, but the messages app never opened. This is the case that used to vanish.
+      storedHeading: "Your enquiry is with Karine",
+      storedBody: "Karine has your booking request and will be in touch. Your messages app did not open on this device, so if you would like to add anything, copy your message below and text her on {phone}.",
+
+      // The messages app opened but we could not record it. The text is the real path here.
+      smsHeading: "One last step",
+      smsBody: "Your messages app has opened with your booking in it. Please press send there, because that is what reaches Karine.",
+
+      // Neither worked. Everything the visitor needs to finish this by hand.
+      noneHeading: "This has not been sent yet",
+      noneBody: "We could not send this for you, and your messages app did not open. Please text or call Karine on {phone}. Your message is below so you do not have to type it again.",
+
+      copyButton: "Copy my message",
+      copyDone: "Copied",
+      copyFailed: "Select the message above and copy it",
+      callLabel: "Call {phone}"
+    },
+
+    // ⚖️ APP 5 asks that people are told what is being collected AT the point of
+    // collection, not only in a policy page they may never open. Shown under the button.
+    collectionNotice: "When you send this, your name, your phone number and the choices you ticked above are recorded, that is the session, whether it is in person or online, and the times that suit you. That way Karine can reply even if your messages app does not open. What you have written in the two message boxes is not recorded here, and neither is your photo. Those go only in your own message.",
+
+    // Shown on the button while the enquiry is in flight. Without it the button simply
+    // greys out for up to a few seconds on a slow connection, which is exactly when
+    // someone reloads the page and loses the very thing this was built to save.
+    sendingLabel: "Sending…",
+
+    // Shown inline when a required detail is missing. The form used to accept a booking
+    // with no name and no number at all, and sent it as "My name: -".
+    validation: {
+      name: "Please add your name so Karine knows who to reply to.",
+      phone: "Please add a phone number so Karine can reach you."
     },
 
     payment: {
@@ -689,7 +760,7 @@ const base = {
   // number lives in exactly one place.
   legal: {
     // ⏭️ Bump this whenever you change the wording of any document below.
-    updated: "18 August 2026",
+    updated: "16 September 2026",
     updatedLabel: "Last updated",
     backLabel: "Back to the site",
     // Order here drives the footer links and the cross-links between the pages.
@@ -720,7 +791,7 @@ const base = {
               "Whatever you choose to tell me: the days and times that suit you, what you would like me to look at, your questions, and anything you share in a message or during your session. That can include things about your health, your relationships and how you are feeling.",
               "A postal address, but only if you have ordered a pendulum and need it sent to you."
             ],
-            after: ["That is the lot. There is no account to create, and there is no form on my website that quietly sends me anything."]
+            after: ["That is the lot, and there is no account to create. When you press send on the booking form, your name, your phone number and the choices you ticked are recorded, that is the session, whether it is in person or online, and the days and times that suit you. That way I can reply to you even if your phone's messaging app does not open. What you write in the two message boxes, and your selfie, are not part of that record: they reach me only in the message you send yourself."]
           },
           {
             h: "Why I collect it",
@@ -755,7 +826,9 @@ const base = {
             h: "This website",
             p: [
               "My website uses a simple, cookie-free visit counter so I can see how many people visit and how many tap the booking buttons. It sets no cookies, does not follow you to other websites, and cannot identify you personally.",
-              "There is also nothing on it that sends me anything. Every Book and Order button simply writes a message for you and opens your own phone's messaging app. Nothing reaches me until you have read it and pressed send yourself.",
+              "The booking form is the one part that does send me something. It used to work only by opening your own messaging app, and I have had to change it: on a computer, and on some overseas phones, that never opens, so people believed they had booked with me when I had received nothing at all. Now, when you press send, your name, your phone number and the choices you ticked are recorded for me straight away, that is the session, whether it is in person or online, and the days and times that suit you. Your messaging app still opens with the full message for you to send.",
+              "What you type into the two message boxes, the ones asking what you would like me to look at and what your questions are, is never recorded by the website. Neither is your selfie. Those reach me only in the message you send yourself, which is why I ask you to press send as well.",
+              "Every Order button still works the old way: it writes a message for you and opens your messaging app, and nothing reaches me until you have pressed send yourself.",
               "The one thing the site loads from somewhere else is the typeface it is set in, which comes from Google Fonts."
             ]
           },
@@ -763,6 +836,7 @@ const base = {
             h: "How I look after it, and how long I keep it",
             p: [
               "I take reasonable steps to keep what you share with me safe, private and out of anyone else's hands.",
+              "The booking details the website records for me are held in the client system my website people run for me, here in Australia, and only I can see mine. I keep an enquiry for two years so that I can find you again if you come back, and then it is deleted.",
               "Your selfie is deleted after your session. Anything else I keep only for as long as I genuinely need it, and then I get rid of it."
             ]
           },

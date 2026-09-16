@@ -1406,6 +1406,9 @@ function renderBooking() {
 
   $('#bkFocus').placeholder = b.focusPlaceholder || '';
   $('#bkSelfie').textContent = b.selfieNote || '';
+  // APP 5 collection notice, rendered from content so it stays with the other copy.
+  const collectionEl = $('#bkCollection');
+  if (collectionEl) collectionEl.textContent = b.collectionNotice || '';
 
   // ⭐ PAYMENT QUESTION — she was asking every enquirer by hand. Options carry
   // an `inPersonOnly` flag; applySelection() below gates them on the format.
@@ -1518,8 +1521,9 @@ function renderBooking() {
   });
 
   const photo = initPhotoPicker();
+  const outcome = initOutcomePanel(photo);
 
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     const sel = wrap.querySelector('input[name="session"]:checked');
     const s = sessions.find(x => x.id === (sel && sel.value));
@@ -1534,6 +1538,17 @@ function renderBooking() {
     const name = form.name.value.trim();
     const phone = form.phone.value.trim();
     const pay = (form.querySelector('input[name="payment"]:checked') || {}).value || '';
+
+    // The form carries `novalidate` and these two fields are `required`, which meant the
+    // browser enforced nothing and the message went out as "My name: -" with no number
+    // on it. A booking Karine cannot reply to is not a booking.
+    const rules = (content.booking && content.booking.validation) || {};
+    if (!name) { outcome.fieldError(form.name, rules.name); return; }
+    outcome.fieldOk(form.name);
+    if (!phone) { outcome.fieldError(form.phone, rules.phone); return; }
+    outcome.fieldOk(form.phone);
+    outcome.clearFieldError();
+
     let body = `Hi Karine! I'd like to book: ${sessionLabel(s)}. Format: ${fmt}.`;
     if (when) body += ` Times that suit me: ${when}.`;
     if (focus) body += ` I'd love you to focus on: ${focus}.`;
@@ -1546,10 +1561,121 @@ function renderBooking() {
     const file = photo.file();
     body += file ? ` Photo: I'm sending one now.` : ` Photo: I haven't sent one yet.`;
 
-    // Reveal the hand-off BEFORE navigating away — the sms: link hands the
-    // screen to the messages app, and this needs to be waiting on return.
-    if (file) photo.showHandoff();
-    window.location.href = `${content.booking.smsHref}?&body=${encodeURIComponent(body)}`;
+    // ⭐ CAPTURE FIRST, HAND OFF SECOND, THEN SAY WHAT ACTUALLY HAPPENED.
+    //
+    // This used to be two lines: reveal a panel that said "Your message is on its way",
+    // then set location.href to the sms: link. On a desktop the browser refuses that
+    // link and does nothing at all, so the sentence was simply untrue and the enquiry
+    // did not exist anywhere. A woman in Canada booked that way on 2026-09-16 and
+    // Karine never heard from her. See content.booking.leadEndpoint for the full note.
+    const btn = form.querySelector('button[type="submit"]');
+    const btnLabel = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = (content.booking.sendingLabel || 'Sending…');
+    }
+    try {
+      // ⚠️ ORDER MATTERS, AND IT IS NOT "AWAIT THE POST FIRST".
+      //
+      // Launching a non-http scheme like sms: needs the browser to still regard the tap as
+      // a live user gesture, and that activation expires after a few seconds. Awaiting a
+      // network round trip before it would put the slowest possible thing between the tap
+      // and the hand-off — on exactly the poor overseas connections this fix is aimed at —
+      // and could break the sms: launch on phones, where it currently works. So the POST is
+      // STARTED here and not awaited: the hand-off happens within microtasks of the click,
+      // and the request flies in parallel. We await its result afterwards, when all it
+      // decides is which sentence to show.
+      //
+      // Only the contact details and the choices made with radio buttons. `focus` and
+      // `questions` are deliberately absent — see the warning on booking.leadEndpoint.
+      const pending = postLead({
+        slug: content.booking.leadSlug,
+        name: name,
+        phone: phone,
+        session: sessionLabel(s),
+        format: fmt,
+        when: when,
+        privacy_consent: true
+      });
+      const opened = await openMessagesApp(body);
+      const stored = await pending;
+      outcome.show({ stored: stored, opened: opened, body: body, file: file });
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = btnLabel;
+      }
+    }
+  });
+}
+
+// ============================================================
+// LEAD CAPTURE + MESSAGES HAND-OFF
+// ------------------------------------------------------------
+// The two halves of sending a booking, each of which reports honestly on itself.
+// ============================================================
+
+// POST the enquiry and return whether the SERVER actually took it.
+//
+// ⚠️ Deliberately a JSON *string* with NO Content-Type header. That arrives as
+// text/plain, which is a CORS-safelisted type, so this never fires a preflight —
+// the same trick analytics.js uses. navigator.sendBeacon cannot be used here: what
+// it returns means "queued inside the browser", not "the server has it", and the
+// entire point of this change is to stop guessing about delivery.
+async function postLead(lead) {
+  const url = content.booking && content.booking.leadEndpoint;
+  if (!url) return false;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 6000);
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      mode: 'cors',
+      // keepalive so the request survives the messages app taking the screen, which is
+      // the normal outcome on a phone and would otherwise cancel it in flight.
+      keepalive: true,
+      body: JSON.stringify(lead),
+      signal: ctrl.signal
+    });
+    return !!res.ok;
+  } catch (_) {
+    // Timed out, offline, blocked, refused. Every one of them means the same thing
+    // to the person standing there: it did not arrive. Never report these as sent.
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Hand off to the visitor's own messages app, and report whether that happened.
+//
+// There is no API for "did this URL scheme launch". What there is: a real hand-off
+// puts the page in the background, and a refused one leaves us sitting right here
+// (Chrome logs "Not allowed to launch sms:..." and does nothing else). So watch for
+// the page losing the screen, and treat a quiet timeout as a refusal. Erring this
+// way is safe: the worst case is offering someone a copy of a message they have
+// already got, which the wording below is written to survive.
+function openMessagesApp(body) {
+  return new Promise(resolve => {
+    let settled = false;
+    function finish(opened) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('pagehide', onLeave);
+      resolve(opened);
+    }
+    function onVis() { if (document.hidden) finish(true); }
+    function onLeave() { finish(true); }
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('pagehide', onLeave);
+    const timer = setTimeout(() => finish(false), 1500);
+    try {
+      window.location.href = `${content.booking.smsHref}?&body=${encodeURIComponent(body)}`;
+    } catch (_) {
+      finish(false);
+    }
   });
 }
 
@@ -1580,7 +1706,9 @@ function initPhotoPicker() {
   let file = null;
   let objectUrl = null;
 
-  const noop = { file: () => null, showHandoff: () => {} };
+  // Same shape as the real return below, so a missing picker can never make the
+  // outcome panel throw mid-send. A booking must survive a broken photo field.
+  const noop = { file: () => null, canShare: () => false, showShare: () => {}, hideShare: () => {} };
   if (!input || !preview || !panel) return noop;
 
   function clearPreview() {
@@ -1653,33 +1781,141 @@ function initPhotoPicker() {
     });
   }
 
-  function showFallback() {
-    if (shareBtn) shareBtn.hidden = true;
-    const phone = (content.booking && content.booking.phone) || '';
-    bodyEl.textContent = (ph.handoffFallback || '').replace('{phone}', phone);
+  // ⚠️ showHandoff()/showFallback() USED TO LIVE HERE AND THEY LIED.
+  // Both opened the panel with "Your message is on its way", and both ran BEFORE the
+  // sms: link was attempted, so on every desktop they asserted a message that was
+  // never sent. The panel is now owned by initOutcomePanel below, which is told what
+  // actually happened before it says anything. All this exposes is the file and
+  // whether the browser can share it.
+  function showShare() {
+    if (!file || !shareBtn) return;
+    shareBtn.textContent = ph.handoffButton || 'Send my photo';
+    shareBtn.hidden = false;
   }
 
-  function showHandoff() {
-    if (!file) return;
-    heading.textContent = ph.handoffHeading || '';
-    if (canShareFile(file)) {
-      bodyEl.textContent = ph.handoffBody || '';
-      if (shareBtn) {
-        shareBtn.textContent = ph.handoffButton || 'Send my photo';
-        shareBtn.hidden = false;
-      }
-    } else {
-      showFallback();
+  function hideShare() {
+    if (shareBtn) shareBtn.hidden = true;
+  }
+
+  return {
+    file: () => file,
+    canShare: () => !!(file && canShareFile(file)),
+    showShare,
+    hideShare
+  };
+}
+
+// ============================================================
+// THE OUTCOME PANEL
+// ------------------------------------------------------------
+// Four things can happen when someone presses send, and this says which one did.
+// Reaching Karine's system and opening the messages app succeed or fail
+// independently, so there is no single sentence that is true in every case — which
+// is exactly what the old code assumed. Never collapse these back into one.
+// ============================================================
+function initOutcomePanel(photo) {
+  const panel   = $('#bkHandoff');
+  const heading = $('#bkHandoffHeading');
+  const bodyEl  = $('#bkHandoffBody');
+  const help    = $('#bkHandoffHelp');
+  const callEl  = $('#bkHandoffCall');
+  const copyBtn = $('#bkHandoffCopy');
+  const msgEl   = $('#bkHandoffMsg');
+  const errEl   = $('#bkError');
+
+  const noop = { show: () => {}, fieldError: () => {}, fieldOk: () => {}, clearFieldError: () => {} };
+  if (!panel || !heading || !bodyEl) return noop;
+
+  const phone = (content.booking && content.booking.phone) || '';
+  const fill = (t) => String(t || '').replace('{phone}', phone);
+
+  function fieldError(field, message) {
+    if (errEl) {
+      errEl.textContent = message || '';
+      errEl.hidden = !message;
     }
+    if (field) {
+      field.setAttribute('aria-invalid', 'true');
+      try { field.focus(); } catch (_) {}
+    }
+  }
+
+  // Clear ONE field the moment it passes. Without this, fixing the name but leaving the
+  // phone empty returns at the phone check and the name keeps its red border and its
+  // aria-invalid, telling the visitor a corrected field is still wrong.
+  function fieldOk(field) {
+    if (field) field.removeAttribute('aria-invalid');
+  }
+
+  function clearFieldError() {
+    if (errEl) { errEl.textContent = ''; errEl.hidden = true; }
+    ['#bkName', '#bkPhone'].forEach(sel => {
+      const el = $(sel);
+      if (el) el.removeAttribute('aria-invalid');
+    });
+  }
+
+  if (copyBtn && msgEl) {
+    copyBtn.addEventListener('click', async () => {
+      const o = (content.booking && content.booking.outcome) || {};
+      try {
+        // navigator.clipboard needs a secure context, which a phone on a plain http
+        // preview will not have. Falling back to select() at least leaves the text
+        // highlighted and ready to copy by hand rather than doing nothing.
+        await navigator.clipboard.writeText(msgEl.value);
+        copyBtn.textContent = o.copyDone || 'Copied';
+      } catch (_) {
+        msgEl.focus();
+        msgEl.select();
+        copyBtn.textContent = o.copyFailed || '';
+      }
+    });
+  }
+
+  function show({ stored, opened, body, file }) {
+    const o  = (content.booking && content.booking.outcome) || {};
+    const ph = (content.booking && content.booking.photo) || {};
+
+    let headingText, bodyText;
+    if (stored && opened)       { headingText = o.bothHeading;   bodyText = o.bothBody; }
+    else if (stored && !opened) { headingText = o.storedHeading; bodyText = o.storedBody; }
+    else if (!stored && opened) { headingText = o.smsHeading;    bodyText = o.smsBody; }
+    else                        { headingText = o.noneHeading;   bodyText = o.noneBody; }
+
+    // The photo is a separate fact and gets its own sentence, never folded into the
+    // one above. It is handed over phone to phone and never uploaded — see the note
+    // on initPhotoPicker, and do not "improve" that.
+    let text = fill(bodyText);
+    if (file) text = `${text} ${fill(photo.canShare() ? ph.photoShare : ph.photoManual)}`;
+
+    heading.textContent = fill(headingText);
+    bodyEl.textContent  = text;
+
+    if (file && photo.canShare()) photo.showShare(); else photo.hideShare();
+
+    // Everything needed to finish this by hand, shown whenever the messages app did
+    // not open — the case that used to disappear without trace.
+    const needsHelp = !opened;
+    if (help) {
+      if (needsHelp) {
+        if (callEl) {
+          callEl.textContent = fill(o.callLabel);
+          callEl.setAttribute('href', (content.booking && content.booking.phoneHref) || '');
+        }
+        if (copyBtn) copyBtn.textContent = o.copyButton || '';
+        if (msgEl) msgEl.value = body || '';
+      }
+      help.hidden = !needsHelp;
+    }
+
     panel.hidden = false;
     // One frame so the reveal transition has something to animate from.
     // ⚠️ No requestAnimationFrame loop here — a single frame, then done.
     requestAnimationFrame(() => panel.classList.add('is-open'));
-    const focusTarget = (shareBtn && !shareBtn.hidden) ? shareBtn : panel;
-    try { focusTarget.focus({ preventScroll: true }); } catch (_) {}
+    try { panel.focus({ preventScroll: true }); } catch (_) {}
   }
 
-  return { file: () => file, showHandoff };
+  return { show, fieldError, fieldOk, clearFieldError };
 }
 
 // ============================================================

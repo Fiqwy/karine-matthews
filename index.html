@@ -503,11 +503,24 @@
             </fieldset>
             <div class="form-submit">
               <button type="submit" class="btn btn-primary">Send my booking request <span class="arrow">→</span></button>
+              <!-- Shown when a required detail is missing. The form is `novalidate`, so
+                   nothing else enforces `required` on the name and phone fields. -->
+              <p class="bk-error" id="bkError" role="alert" hidden></p>
+              <!-- APP 5: say what is being collected AT the point of collection. -->
+              <p class="bk-collection" id="bkCollection"></p>
             </div>
             <div class="bk-handoff" id="bkHandoff" role="status" aria-live="polite" tabindex="-1" hidden>
               <h3 id="bkHandoffHeading"></h3>
               <p id="bkHandoffBody"></p>
               <button class="btn btn-primary" id="bkHandoffBtn" type="button" hidden></button>
+              <!-- Everything needed to finish the booking by hand, revealed only when the
+                   messages app did not open. Before 2026-09-16 that case showed a cheerful
+                   "your message is on its way" and offered nothing at all. -->
+              <div class="bk-handoff-help" id="bkHandoffHelp" hidden>
+                <a class="bk-handoff-call" id="bkHandoffCall" href=""></a>
+                <textarea class="bk-handoff-msg" id="bkHandoffMsg" rows="5" readonly aria-label="Your booking message"></textarea>
+                <button class="bk-handoff-copy" id="bkHandoffCopy" type="button"></button>
+              </div>
             </div>
             <p class="form-note" id="formNote"></p>
             <div class="bk-payment" id="bkPayment"></div>
