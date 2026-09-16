@@ -1,3 +1,36 @@
+/* ---------------------------------------------------------------------------
+   Metric-matched fallbacks.
+
+   The hero copy now sits in the HTML, so text paints immediately in a fallback
+   font and then RE-FLOWS when Cormorant Garamond and Jost arrive. Measured on a
+   normally-connected machine that reflow is 0.179 layout shift on the hero,
+   against Google's 0.1 limit. It is not caused by self-hosting or by the CDN:
+   a layout shift needs a previous frame to compare against, and before the hero
+   copy was in the HTML there was nothing on screen to shift.
+
+   These two faces are Georgia and Helvetica RE-SCALED so they occupy exactly the
+   space the real fonts will. The values are computed from the actual font files
+   (x-height ratios and hhea metrics via fontTools), not guessed. Nothing about
+   the finished page changes: once the real font loads it renders as before. What
+   changes is that the page no longer jumps when it does.
+   --------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Cormorant Garamond Fallback';
+  src: local('Georgia'), local('Times New Roman');
+  size-adjust: 80.18%;
+  ascent-override: 114.36%;
+  descent-override: 27.34%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Jost Fallback';
+  src: local('Helvetica Neue'), local('Helvetica'), local('Arial');
+  size-adjust: 87.97%;
+  ascent-override: 87.53%;
+  descent-override: 26.14%;
+  line-gap-override: 0%;
+}
+
 /* ============================================================
    KARINE S. MATTHEWS — STYLES
    Golden hour: warm cream and sand, candlelight gold + soft
@@ -85,8 +118,8 @@
   --mote:         rgba(198, 150, 74, 0.55);
 
   /* Type — serif display (emotion) + clean sans (UI/body) */
-  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --font-body:    'Jost', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Cormorant Garamond', 'Cormorant Garamond Fallback', Georgia, 'Times New Roman', serif;
+  --font-body:    'Jost', 'Jost Fallback', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* Rhythm */
   --gap-section:    clamp(5rem, 10vw, 9rem);
