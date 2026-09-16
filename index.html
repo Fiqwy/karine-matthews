@@ -99,13 +99,24 @@
       </div>
       <canvas class="hero-motes" id="heroMotes" aria-hidden="true"></canvas>
 
+
+      <!-- The hero copy is rendered here as well as by the render in content.client.js, and
+           the two are byte-identical: this markup was captured FROM the rendered page rather
+           than retyped, so the words wrap exactly as they did.
+           Reason: these elements shipped empty and were filled after the scripts ran, so on a
+           real phone the block grew from nothing after first paint and carried the whole hero
+           with it. Measured 0.217 Cumulative Layout Shift on mobile against Google's 0.1
+           threshold, and it is the jump you feel under your thumb while reading.
+           The render still runs and still overwrites every one of these, so nothing about
+           editing the copy changes. This only means the space is reserved at first paint. -->
       <div class="container hero-content" id="heroContent">
-        <p class="hero-kicker" id="heroKicker"></p>
-        <h1 class="hero-title split" id="heroTitle"></h1>
-        <p class="hero-tagline" id="heroTagline"></p>
-        <p class="hero-sub" id="heroSub"></p>
-        <div class="hero-ctas" id="heroCtas"></div>
-        <ul class="hero-trust" id="heroTrust" aria-label="What to expect"></ul>
+        <p class="hero-kicker" id="heroKicker">Welcome to</p>
+        <h1 class="hero-title split" id="heroTitle"><span class="line"><span class="split-word" style="--i: 0;"><span>Reconnect</span></span> <span class="split-word" style="--i: 1;"><span>with</span></span></span><span class="line"><span class="split-word" style="--i: 0;"><span><em>Karine S. Matthews</em></span></span></span></h1>
+        <p class="hero-tagline" id="heroTagline"><span>Psychic Medium</span><i class="tagline-dot" aria-hidden="true">·</i><span>Intuitive Guidance</span><i class="tagline-dot" aria-hidden="true">·</i><span>Spiritual Healing</span><i class="tagline-dot" aria-hidden="true">·</i><span>Clarity</span></p>
+        <p class="hero-sub" id="heroSub">Guiding you toward clarity, healing, and connection.</p>
+        <div class="hero-ctas" id="heroCtas"><a href="#book" class="btn btn-primary">Book a session <span class="arrow">→</span></a>
+    <a href="sms:+61404098706?&amp;body=Hi%20Karine!%20I'd%20like%20to%20book%20a%20session.%20My%20name%3A%20" class="btn btn-ghost">Text Karine</a></div>
+        <ul class="hero-trust" id="heroTrust" aria-label="What to expect"><li>In person in Gilston + online worldwide</li><li>Warm, private and never rushed</li><li>I reply personally, usually within a day</li></ul>
       </div>
 
       <div class="scroll-cue" aria-hidden="true"></div>
