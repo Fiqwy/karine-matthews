@@ -44,16 +44,6 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232B1D10'/%3E%3Cpath d='M20.5 21a7 7 0 1 1-4.2-12.9 8 8 0 1 0 4.2 12.9z' fill='%23E8C583'/%3E%3Ccircle cx='22' cy='10' r='1.3' fill='%23C0764E'/%3E%3C/svg%3E">
   <!-- fetchpriority high: this stylesheet is what the first text paint waits on, and it
        was arriving last behind three animation libraries on a slow connection. -->
-  <!-- The two faces the hero paints in, preloaded.
-       Removing these sped the first paint up (the stylesheet stopped queueing behind
-       them) and then cost more than it bought: with font-display:swap the text painted
-       in a fallback at ~1.5s and REFLOWED when the real font landed at 2.7s, measured
-       as 0.179 layout shift on the hero. Paint speed is worth less than the page
-       holding still, so these come back and the stylesheet keeps its priority. -->
-  <link rel="preload" href="assets/fonts/jost-400-normal-latin.woff2" as="font"
-        type="font/woff2" crossorigin fetchpriority="high">
-  <link rel="preload" href="assets/fonts/cormorantgaramond-600-normal-latin.woff2"
-        as="font" type="font/woff2" crossorigin fetchpriority="high">
   <link rel="stylesheet" href="styles.css" fetchpriority="high">
 </head>
 <body>
