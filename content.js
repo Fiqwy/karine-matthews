@@ -660,6 +660,11 @@ const base = {
     // now says which one actually happened instead of asserting the happy one. Never
     // reintroduce a single blanket "your message is on its way" here — that sentence is
     // what cost her a client. {phone} becomes booking.phone.
+    //
+    // ⚠️ THE WORDING IS ALSO CONDITIONAL ON PURPOSE ("if your messages app did not
+    // open"), never an assertion. Some desktops hand off to a registered handler
+    // without ever backgrounding the page, so the check can read "did not open" when
+    // it did. Stating it as fact would just be a different false sentence.
     outcome: {
       // Stored AND the messages app opened. The best case, and still not a promise that
       // she has pressed send, because she has not.
@@ -668,7 +673,7 @@ const base = {
 
       // Stored, but the messages app never opened. This is the case that used to vanish.
       storedHeading: "Your enquiry is with Karine",
-      storedBody: "Karine has your booking request and will be in touch. Your messages app did not open on this device, so if you would like to add anything, copy your message below and text her on {phone}.",
+      storedBody: "Karine has your booking request and will be in touch. If your messages app did not open, or you would like to add anything, copy your message below and text her on {phone}.",
 
       // The messages app opened but we could not record it. The text is the real path here.
       smsHeading: "One last step",
@@ -676,7 +681,7 @@ const base = {
 
       // Neither worked. Everything the visitor needs to finish this by hand.
       noneHeading: "This has not been sent yet",
-      noneBody: "We could not send this for you, and your messages app did not open. Please text or call Karine on {phone}. Your message is below so you do not have to type it again.",
+      noneBody: "We could not send this for you. Please text or call Karine on {phone}. Your message is below so you do not have to type it again.",
 
       copyButton: "Copy my message",
       copyDone: "Copied",
