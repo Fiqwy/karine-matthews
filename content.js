@@ -420,8 +420,10 @@ const base = {
     // source: "Publicly shared on her Google Business Profile". Set `href` to a
     // CONFIRM placeholder (or delete it) and the whole block hides itself.
     reviewCta: {
-      lead: "Had a session with Karine?",
-      body: "A few honest words on Google help others find their way to her. It only takes a minute, and every reflection is read with gratitude.",
+      // First person on purpose: the intro above is Karine's own voice
+      // ("I am deeply grateful…"), so the ask stays in it too.
+      lead: "Had a session with me?",
+      body: "A few honest words on Google help others find their way here. It only takes a minute, and I read every reflection with gratitude.",
       label: "Leave a Google review",
       href: "https://g.page/r/CU2bRXhDGDvMEBM/review"
     },
