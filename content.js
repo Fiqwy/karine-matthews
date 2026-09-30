@@ -412,6 +412,19 @@ const base = {
     headline: "Client Reflections",
     subhead: "Shared from the Heart, in Their Own Words",
     sub: "The reflections below have been generously shared with permission by those I've been blessed to read for and support through intuitive psychic mediumship readings and Reiki healing sessions. To honour their privacy, all testimonials have been kept anonymous.\n\nI am deeply grateful for the trust each person has placed in me and for allowing me to be part of their journey. I hope their experiences offer you a glimpse into the clarity, healing, and connection that is possible.",
+    // ⭐ LEAVE A GOOGLE REVIEW (2026-09-30). Karine's real "write a review"
+    // short link from her Google Business Profile, supplied by Nicholas. It opens
+    // Google's own review form in a new tab; nothing is collected on this site.
+    // A review written there appears on her Google profile only — to show it
+    // here too, copy it into `items` below with
+    // source: "Publicly shared on her Google Business Profile". Set `href` to a
+    // CONFIRM placeholder (or delete it) and the whole block hides itself.
+    reviewCta: {
+      lead: "Had a session with Karine?",
+      body: "A few honest words on Google help others find their way to her. It only takes a minute, and every reflection is read with gratitude.",
+      label: "Leave a Google review",
+      href: "https://g.page/r/CU2bRXhDGDvMEBM/review"
+    },
     // Factually TRUE proof points, shown until real client quotes exist.
     proofPoints: [
       { metric: "Intuition-led",      label: "every session",  sub: "Guided by Spirit, tarot and pendulum, never a script." },

@@ -978,6 +978,23 @@ body.has-cursor .cursor-glow { opacity: 1; }
 .gatherings-panels .inclusion { margin-top: 0; }
 .gatherings-cta { margin-top: clamp(1.6rem, 3.5vw, 2.4rem); text-align: center; }
 
+/* --- Leave a Google review (2026-09-30): a quiet card under the reviews rail.
+   Ghost button, not gold — the ask is secondary to booking. --- */
+.voices-cta { margin-top: clamp(1.8rem, 4vw, 2.8rem); text-align: center; }
+.voices-cta-inner {
+  max-width: 40rem; margin-inline: auto; padding: clamp(1.5rem, 3.5vw, 2.4rem);
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-soft);
+}
+.voices-cta-lead { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.4rem, 2.6vw, 1.7rem); line-height: 1.25; color: var(--text-primary); margin-bottom: 0.5rem; }
+.voices-cta-body { color: var(--text-muted); max-width: 46ch; margin: 0 auto 1.3rem; }
+.voices-cta-btn .g-mark { flex: none; }
+.voices-cta-note { margin-top: 0.8rem; font-size: 0.8rem; color: var(--text-muted); }
+/* The pill is ~280px wide; a 320px phone leaves it ~250px, so it may wrap there. */
+@media (max-width: 640px) {
+  .voices-cta-inner { padding-inline: 1.1rem; }
+  .voices-cta-btn { white-space: normal; text-align: left; max-width: 100%; }
+}
+
 /* --- Karine writes in paragraphs. These carry her breaks. --- */
 .svc-blurb + .svc-blurb,
 .about-bio-p + .about-bio-p,
