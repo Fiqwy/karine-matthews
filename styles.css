@@ -986,7 +986,10 @@ body.has-cursor .cursor-glow { opacity: 1; }
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-soft);
 }
 .voices-cta-lead { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.4rem, 2.6vw, 1.7rem); line-height: 1.25; color: var(--text-primary); margin-bottom: 0.5rem; }
-.voices-cta-body { color: var(--text-muted); max-width: 46ch; margin: 0 auto 1.3rem; }
+.voices-cta-body { color: var(--text-muted); max-width: 46ch; margin: 0 auto; }
+.voices-cta-body + .voices-cta-body { margin-top: 0.85em; }
+.voices-cta-body + .voices-cta-btn { margin-top: 1.3rem; }
+.voices-cta-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .voices-cta-btn .g-mark { flex: none; }
 .voices-cta-note { margin-top: 0.8rem; font-size: 0.8rem; color: var(--text-muted); }
 /* The pill is ~280px wide; a 320px phone leaves it ~250px, so it may wrap there. */

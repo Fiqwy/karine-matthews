@@ -420,11 +420,12 @@ const base = {
     // source: "Publicly shared on her Google Business Profile". Set `href` to a
     // CONFIRM placeholder (or delete it) and the whole block hides itself.
     reviewCta: {
-      // First person on purpose: the intro above is Karine's own voice
-      // ("I am deeply grateful…"), so the ask stays in it too.
-      lead: "Had a session with me?",
-      body: "A few honest words on Google help others find their way here. It only takes a minute, and I read every reflection with gratitude.",
-      label: "Leave a Google review",
+      // ⭐ KARINE'S OWN WORDS, verbatim (via Nicholas, 2026-09-30). Do not tidy.
+      // `body` is two paragraphs; renderVoicesCta() runs it through paras().
+      lead: "Did Your Reading Resonate? 🦋",
+      body: "If our session resonated with you, I’d be so grateful if you shared your experience.\n\nYour words not only mean so much to me, they also help others who may be looking for clarity, guidance and connection feel confident taking that first step.",
+      label: "Leave a Google Review",
+      note: "It only takes a moment, and I truly appreciate every review. 🦋",
       href: "https://g.page/r/CU2bRXhDGDvMEBM/review"
     },
     // Factually TRUE proof points, shown until real client quotes exist.

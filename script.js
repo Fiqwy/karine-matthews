@@ -765,7 +765,7 @@ function renderVoicesCta(c) {
   slot.innerHTML = `
     <div class="voices-cta-inner" data-reveal>
       ${c.lead ? `<p class="voices-cta-lead">${c.lead}</p>` : ''}
-      ${c.body ? `<p class="voices-cta-body">${c.body}</p>` : ''}
+      ${c.body ? paras(c.body, 'voices-cta-body') : ''}
       <a class="btn btn-ghost voices-cta-btn" href="${href}" target="_blank" rel="noopener">
         <svg class="g-mark" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
           <path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.4z"/>
@@ -773,9 +773,9 @@ function renderVoicesCta(c) {
           <path fill="#FBBC05" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2L6.4 14z"/>
           <path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.4L6.4 10c.8-2.3 3-4.1 5.6-4.1z"/>
         </svg>
-        ${c.label || 'Leave a Google review'} <span class="arrow">→</span>
+        ${c.label || 'Leave a Google review'} <span class="arrow">→</span><span class="voices-cta-sr">(opens Google in a new tab)</span>
       </a>
-      <p class="voices-cta-note">Opens Google in a new tab.</p>
+      ${c.note ? `<p class="voices-cta-note">${c.note}</p>` : ''}
     </div>`;
 }
 
